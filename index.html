@@ -144,6 +144,16 @@ html.dark .sidebar-item.active{color:#ff8a74}
 .notes-textarea::placeholder{color:rgba(255,255,255,.2)}
 .si-note-icon{font-size:9px;flex-shrink:0;opacity:.5}
 
+/* Timer */
+.timer-wrap{display:flex;align-items:center;gap:6px}
+.timer-display{font-family:var(--mono);font-size:12px;font-weight:700;color:#4ecdc4;min-width:48px;text-align:center;padding:3px 8px;background:rgba(78,205,196,.1);border-radius:12px;border:1px solid rgba(78,205,196,.2)}
+.timer-display.running{animation:timerPulse 2s ease-in-out infinite}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.6}}
+.timer-btn{width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0}
+.timer-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+.timer-btn.active{background:rgba(78,205,196,.2);border-color:rgba(78,205,196,.4);color:#4ecdc4}
+.dash-card-study{font-size:10px;font-weight:600;color:var(--teal);margin-top:4px;display:flex;align-items:center;gap:4px}
+
 /* ADD MODAL */
 #modal-adddis{display:none;position:fixed;inset:0;z-index:200;background:rgba(26,26,26,.55);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px}
 #modal-adddis.open{display:flex}
@@ -451,7 +461,8 @@ function renderDashGrid(){
     <div class="dash-card-code">${esc(d.code)} · ${esc(d.sem)}</div>
     <div class="dash-card-title">${esc(d.name)}</div>
     <div class="dash-card-progress"><div class="dash-card-bar" style="width:${pct}%;background:${esc(d.color)}"></div></div>
-    <div class="dash-card-meta">${pct}% concluído · ${d.weeks.length} semanas · ${esc(d.book)}</div></div>`}).join("")
+    <div class="dash-card-meta">${pct}% concluído · ${d.weeks.length} semanas · ${esc(d.book)}</div>
+    ${getStudyTime(d.id)>0?`<div class="dash-card-study">⏱ ${formatStudyTime(getStudyTime(d.id))} estudadas</div>`:''}</div>`}).join("")
     +`<div class="dash-card dash-card-add fade-up" onclick="openAddModal()" tabindex="0" role="button" aria-label="Nova disciplina"><div class="add-icon">＋</div><div class="add-label">Nova Disciplina</div></div>`}
 
 function buildDiscPanel(d){
@@ -507,7 +518,13 @@ function openWeek(did,wn,scroll=true){
   const toolbar=`<div class="viewer-toolbar"><div class="viewer-week-title"><span style="color:${esc(mc)};margin-right:6px">●</span>Semana ${esc(week.num)} · ${esc(week.title)}<span style="opacity:.4;margin:0 8px">·</span><span style="opacity:.5">${esc(week.cap)}</span></div>
     <button class="viewer-btn" onclick="prevWeek('${esc(did)}','${esc(wn)}')" aria-label="Semana anterior">← Anterior</button>
     <button class="viewer-btn" onclick="nextWeek('${esc(did)}','${esc(wn)}')" aria-label="Próxima semana">Próxima →</button>
-    <button class="viewer-btn accent" onclick="downloadWeek('${esc(did)}','${esc(wn)}')" aria-label="Baixar PDF">⬇ PDF</button></div>`;
+    <button class="viewer-btn accent" onclick="downloadWeek('${esc(did)}','${esc(wn)}')" aria-label="Baixar PDF">⬇ PDF</button>
+    <div class="timer-wrap">
+      <button class="timer-btn ${TIMER.running&&TIMER.did===did?'active':''}" onclick="toggleTimer('${esc(did)}')"
+        id="timer-play-${esc(did)}" title="Iniciar Pomodoro" aria-label="Iniciar timer">${TIMER.running&&TIMER.did===did?'⏸':'▶'}</button>
+      <span class="timer-display ${TIMER.running&&TIMER.did===did?'running':''}" id="timer-disp-${esc(did)}">${formatTimer(TIMER.did===did?TIMER.remaining:TIMER.duration)}</span>
+      <button class="timer-btn" onclick="resetTimer('${esc(did)}')" title="Reiniciar timer" aria-label="Reiniciar timer">↻</button>
+    </div></div>`;
   if(week.pdfUrl){
     v.innerHTML=toolbar+`<iframe class="viewer-frame" src="${esc(week.pdfUrl)}" title="PDF — ${esc(disc.code)} Semana ${esc(week.num)}"></iframe>`;
   } else {
@@ -538,6 +555,54 @@ function openWeek(did,wn,scroll=true){
 function prevWeek(did,wn){const d=STATE.disciplines.find(x=>x.id===did),i=d.weeks.findIndex(w=>w.num===wn);if(i>0)openWeek(did,d.weeks[i-1].num)}
 function nextWeek(did,wn){const d=STATE.disciplines.find(x=>x.id===did),i=d.weeks.findIndex(w=>w.num===wn);if(i<d.weeks.length-1)openWeek(did,d.weeks[i+1].num)}
 function downloadWeek(did,wn){alert(`[Scaff] Em produção: download do PDF\n${did.toUpperCase()} · Semana ${wn}`)}
+
+/* ═══ POMODORO TIMER ═══ */
+const TIMER={running:false,did:null,interval:null,remaining:25*60,duration:25*60,startedAt:null};
+function formatTimer(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function getStudyTime(did){const t=loadData('studytime',{});return t[did]||0}
+function addStudyTime(did,mins){const t=loadData('studytime',{});t[did]=(t[did]||0)+mins;saveData('studytime',t)}
+function formatStudyTime(mins){if(mins<60)return mins+'min';const h=Math.floor(mins/60),m=mins%60;return h+'h'+(m?String(m).padStart(2,'0')+'m':'')}
+
+function toggleTimer(did){
+  if(TIMER.running&&TIMER.did===did){pauseTimer();return}
+  if(TIMER.running&&TIMER.did!==did)pauseTimer();
+  TIMER.did=did;TIMER.running=true;TIMER.startedAt=Date.now();
+  const disp=document.getElementById('timer-disp-'+did),btn=document.getElementById('timer-play-'+did);
+  if(disp)disp.classList.add('running');
+  if(btn){btn.classList.add('active');btn.textContent='\u23F8'}
+  TIMER.interval=setInterval(()=>{
+    TIMER.remaining--;
+    const d2=document.getElementById('timer-disp-'+TIMER.did);
+    if(d2)d2.textContent=formatTimer(TIMER.remaining);
+    if(TIMER.remaining<=0){finishTimer()}
+  },1000);
+}
+function pauseTimer(){
+  TIMER.running=false;clearInterval(TIMER.interval);
+  if(TIMER.startedAt){const mins=Math.round((Date.now()-TIMER.startedAt)/60000);if(mins>0)addStudyTime(TIMER.did,mins);TIMER.startedAt=null}
+  const disp=document.getElementById('timer-disp-'+TIMER.did),btn=document.getElementById('timer-play-'+TIMER.did);
+  if(disp)disp.classList.remove('running');
+  if(btn){btn.classList.remove('active');btn.textContent='\u25B6'}
+}
+function resetTimer(did){
+  if(TIMER.running&&TIMER.did===did)pauseTimer();
+  TIMER.remaining=TIMER.duration;TIMER.did=did;
+  const disp=document.getElementById('timer-disp-'+did);
+  if(disp){disp.textContent=formatTimer(TIMER.duration);disp.classList.remove('running')}
+}
+function finishTimer(){
+  const mins=Math.round(TIMER.duration/60);
+  addStudyTime(TIMER.did,mins);
+  clearInterval(TIMER.interval);TIMER.running=false;TIMER.remaining=TIMER.duration;TIMER.startedAt=null;
+  playBeep();
+  const disp=document.getElementById('timer-disp-'+TIMER.did),btn=document.getElementById('timer-play-'+TIMER.did);
+  if(disp){disp.textContent='00:00';disp.classList.remove('running')}
+  if(btn){btn.classList.remove('active');btn.textContent='\u25B6'}
+  setTimeout(()=>{if(disp)disp.textContent=formatTimer(TIMER.duration)},3000);
+}
+function playBeep(){
+  try{const ctx=new(window.AudioContext||window.webkitAudioContext)();for(let i=0;i<3;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.value=0.15;o.start(ctx.currentTime+i*0.25);o.stop(ctx.currentTime+i*0.25+0.15)}}catch(e){}
+}
 
 /* ═══ PASSWORD TOGGLE ═══ */
 function togglePassVis(){
