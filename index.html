@@ -135,6 +135,15 @@ html.dark .sidebar-item.active{color:#ff8a74}
 .viewer-placeholder .vp-icon{font-size:3rem;opacity:.25}
 .viewer-placeholder .vp-msg{font-size:13px;font-weight:500;color:rgba(255,255,255,.3)}
 
+/* Notes */
+.notes-panel{background:var(--viewer-toolbar);border-top:1px solid rgba(255,255,255,.07);padding:0;display:flex;flex-direction:column;max-height:220px;transition:background .4s}
+.notes-header{display:flex;align-items:center;gap:8px;padding:8px 18px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.45);border-bottom:1px solid rgba(255,255,255,.05)}
+.notes-header .nh-icon{font-size:13px}.notes-header .nh-count{margin-left:auto;font-weight:500;font-size:10px;letter-spacing:0;text-transform:none;opacity:.5}
+.notes-header .nh-saved{color:#4ecdc4;font-size:10px;font-weight:600;letter-spacing:0;text-transform:none;opacity:0;transition:opacity .3s}.notes-header .nh-saved.show{opacity:1}
+.notes-textarea{flex:1;background:transparent;border:none;color:rgba(255,255,255,.8);font-family:var(--mono);font-size:12px;line-height:1.7;padding:10px 18px;resize:none;outline:none;scrollbar-width:thin}
+.notes-textarea::placeholder{color:rgba(255,255,255,.2)}
+.si-note-icon{font-size:9px;flex-shrink:0;opacity:.5}
+
 /* ADD MODAL */
 #modal-adddis{display:none;position:fixed;inset:0;z-index:200;background:rgba(26,26,26,.55);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px}
 #modal-adddis.open{display:flex}
@@ -399,6 +408,23 @@ function setWeekDone(did,wn,done){const p=getProgress();if(!p[did])p[did]={};p[d
 function isWeekDone(did,wn){const p=getProgress();return !!(p[did]&&p[did][wn])}
 function calcProgress(did){const d=STATE.disciplines.find(x=>x.id===did);if(!d)return 0;const p=getProgress();const dp=p[did]||{};return Math.round((d.weeks.filter(w=>dp[w.num]).length/d.weeks.length)*100)}
 
+/* ═══ NOTES ═══ */
+function getAllNotes(){return loadData('notes',{})}
+function getNote(did,wn){const n=getAllNotes();return (n[did]&&n[did][wn])||''}
+function saveNote(did,wn,text){const n=getAllNotes();if(!n[did])n[did]={};if(text.trim())n[did][wn]=text;else delete n[did][wn];saveData('notes',n)}
+function hasNote(did,wn){const n=getAllNotes();return !!(n[did]&&n[did][wn]&&n[did][wn].trim())}
+let _noteTimer=null;
+function autoSaveNote(did,wn,textarea){
+  clearTimeout(_noteTimer);
+  _noteTimer=setTimeout(()=>{
+    saveNote(did,wn,textarea.value);
+    const saved=document.getElementById('note-saved-'+did);
+    if(saved){saved.classList.add('show');setTimeout(()=>saved.classList.remove('show'),1200)}
+    const si=document.getElementById('si-'+did+'-'+wn);
+    if(si){let icon=si.querySelector('.si-note-icon');if(textarea.value.trim()){if(!icon){icon=document.createElement('span');icon.className='si-note-icon';icon.textContent='📝';si.insertBefore(icon,si.querySelector('.si-check'))}}else{if(icon)icon.remove()}}
+  },400);
+}
+
 /* ═══ INIT ═══ */
 function initApp(){renderTabs();renderAppBody();showDashboard()}
 
@@ -435,6 +461,7 @@ function buildDiscPanel(d){
     ${weeks.map(w=>{const done=isWeekDone(d.id,w.num);return`<div class="sidebar-item ${done?'completed':''}" id="si-${esc(d.id)}-${esc(w.num)}" onclick="openWeek('${esc(d.id)}','${esc(w.num)}')" data-title="${esc(w.title.toLowerCase())}" data-cap="${esc(w.cap.toLowerCase())}">
       <span class="si-num">${esc(w.num)}</span><span class="si-dot" style="background:${esc(MOD_COLORS[w.mod]||d.color)}"></span>
       <span class="si-title">${esc(w.title)}</span>
+      ${hasNote(d.id,w.num)?'<span class="si-note-icon">📝</span>':''}
       <input type="checkbox" class="si-check" ${done?'checked':''} onclick="event.stopPropagation();toggleWeekDone('${esc(d.id)}','${esc(w.num)}',this)" aria-label="Marcar semana ${esc(w.num)} concluída" title="Concluída"></div>`}).join("")}`).join("");
   const weekPills=Object.entries(groups).map(([mod,weeks])=>
     `<div class="week-pill" style="color:${esc(MOD_COLORS[mod]||d.color)};cursor:default;font-weight:800;font-size:10px;letter-spacing:.12em">▸ ${esc(MOD_LABELS[mod]||mod)}</div>`+
@@ -499,6 +526,14 @@ function openWeek(did,wn,scroll=true){
         ou defina <code style="background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px;font-size:10px">week.pdfUrl</code> nos dados.
       </div></div>`;
   }
+  // Notes panel (always shown)
+  const noteText=getNote(did,wn).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  v.innerHTML+=`<div class="notes-panel">
+    <div class="notes-header"><span class="nh-icon">📝</span> Anotações
+      <span class="nh-saved" id="note-saved-${esc(did)}">salvo ✓</span>
+      <span class="nh-count" id="note-count-${esc(did)}">${getNote(did,wn).length} chars</span></div>
+    <textarea class="notes-textarea" id="note-ta-${esc(did)}-${esc(wn)}" placeholder="Escreva suas anotações sobre esta semana..."
+      oninput="autoSaveNote('${esc(did)}','${esc(wn)}',this);document.getElementById('note-count-${esc(did)}').textContent=this.value.length+' chars'">${noteText}</textarea></div>`;
 }
 function prevWeek(did,wn){const d=STATE.disciplines.find(x=>x.id===did),i=d.weeks.findIndex(w=>w.num===wn);if(i>0)openWeek(did,d.weeks[i-1].num)}
 function nextWeek(did,wn){const d=STATE.disciplines.find(x=>x.id===did),i=d.weeks.findIndex(w=>w.num===wn);if(i<d.weeks.length-1)openWeek(did,d.weeks[i+1].num)}
