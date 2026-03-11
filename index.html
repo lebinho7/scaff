@@ -212,6 +212,31 @@ html.dark .sidebar-item.active{color:#ff8a74}
 .sched-card .sc-cap{font-size:9px;color:var(--muted);margin-top:2px}
 .sched-empty{font-size:11px;color:var(--muted);text-align:center;opacity:.4;margin-top:auto;padding:8px}
 
+/* Community */
+.comm-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.comm-title{font-size:1.3rem;font-weight:800;color:var(--teal)}
+.channel-chips{display:flex;gap:6px;flex-wrap:wrap}
+.channel-chip{font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;border:1.5px solid var(--rule);background:var(--card-bg);color:var(--muted);cursor:pointer;transition:all .15s}
+.channel-chip:hover{border-color:var(--coral);color:var(--coral)}
+.channel-chip.active{background:var(--coral);border-color:var(--coral);color:#fff}
+.post-compose{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--r);padding:16px;margin-bottom:20px;display:flex;gap:12px;align-items:flex-start;transition:background .4s,border-color .4s}
+.post-compose textarea{flex:1;background:var(--paper2);border:1px solid var(--rule);border-radius:var(--r-sm);padding:10px 14px;font-family:var(--sans);font-size:12px;color:var(--ink);resize:none;outline:none;min-height:50px;transition:background .4s,border-color .4s,color .4s}
+.post-compose textarea::placeholder{color:var(--muted)}
+.post-compose textarea:focus{border-color:var(--coral)}
+.post-compose-btn{font-size:11px;font-weight:700;padding:8px 18px;border-radius:20px;border:none;background:var(--coral);color:#fff;cursor:pointer;transition:background .15s;flex-shrink:0;align-self:flex-end}
+.post-compose-btn:hover{background:var(--coral-dk)}
+.post-card{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--r);padding:16px;margin-bottom:10px;transition:background .4s,border-color .4s}
+.post-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.post-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.post-name{font-size:12px;font-weight:700;color:var(--ink)}
+.post-time{font-size:10px;color:var(--muted);margin-left:auto}
+.post-channel{font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:rgba(26,95,110,.08);color:var(--teal);border:1px solid rgba(26,95,110,.15)}
+.post-body{font-size:13px;color:var(--ink);line-height:1.6;margin-bottom:10px}
+.post-actions{display:flex;gap:16px}
+.post-action{font-size:11px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:4px;transition:color .15s}
+.post-action:hover{color:var(--coral)}
+.post-action.liked{color:var(--coral);font-weight:700}
+
 /* Deadlines */
 .dl-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0}
 .dl-badge.red{background:rgba(232,85,62,.15);color:#E8553E;border:1px solid rgba(232,85,62,.3)}
@@ -595,10 +620,7 @@ function renderAppBody(){
     <div id="upcoming-area"></div>
     <div class="dash-grid" id="dash-grid"></div></div>`
   +`<div class="global-panel" id="panel-schedule"></div>`
-  +`<div class="global-panel" id="panel-community">
-    <div class="gp-hero fade-up"><div class="gp-hero-icon">💬</div>
-      <div class="gp-hero-title">Comunidade Scaff</div>
-      <div class="gp-hero-sub">Tire dúvidas, compartilhe materiais e se conecte com colegas. Em breve: fórum por disciplina com canais temáticos.</div></div></div>`
+  +`<div class="global-panel" id="panel-community"></div>`
   +STATE.disciplines.map(d=>buildDiscPanel(d)).join("");
   renderDashGrid();renderUpcoming()}
 
@@ -664,7 +686,7 @@ function filterSidebar(did,query){
 function hideAllPanels(){document.querySelectorAll('.disc-panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-dashboard').style.display='none';document.querySelectorAll('.global-panel').forEach(p=>p.classList.remove('active'))}
 function showDashboard(){STATE.activeDisc=null;STATE.activeGlobal=null;hideAllPanels();const d=document.getElementById('panel-dashboard');d.style.display='flex';d.style.flexDirection='column';renderDashGrid();renderUpcoming();renderTabs()}
 function showSchedule(){STATE.activeDisc=null;STATE.activeGlobal='schedule';hideAllPanels();document.getElementById('panel-schedule').classList.add('active');renderSchedule();renderTabs()}
-function showCommunity(){STATE.activeDisc=null;STATE.activeGlobal='community';hideAllPanels();document.getElementById('panel-community').classList.add('active');renderTabs()}
+function showCommunity(){STATE.activeDisc=null;STATE.activeGlobal='community';hideAllPanels();document.getElementById('panel-community').classList.add('active');renderCommunity();renderTabs()}
 function openDisc(id){STATE.activeDisc=id;STATE.activeGlobal=null;hideAllPanels();const panel=document.getElementById("panel-"+id);if(panel)panel.classList.add("active");renderTabs();const last=STATE.activeWeeks[id];if(last)openWeek(id,last,false)}
 function closeDisc(id){if(!confirm('Remover '+id.toUpperCase()+' da sessão?'))return;STATE.disciplines=STATE.disciplines.filter(d=>d.id!==id);if(STATE.activeDisc===id)STATE.activeDisc=null;renderTabs();renderAppBody();showDashboard()}
 function openWeek(did,wn,scroll=true){
@@ -836,6 +858,71 @@ function renderSchedule(){
     </div>`;
   });
   html+='</div>';
+  panel.innerHTML=html;
+}
+
+/* ═══ COMMUNITY FORUM ═══ */
+const AVATAR_COLORS=['#E8553E','#1A5F6E','#2a4a6a','#c8502a','#6a4a2a','#4a6a2a'];
+const MOCK_POSTS=[
+  {id:1,name:'Ana Oliveira',channel:'calc',text:'Alguém tem macete pra decorar as fórmulas de Green e Stokes? Tô confundindo tudo na hora da prova.',time:'2h',likes:5},
+  {id:2,name:'Pedro Santos',channel:'fisica',text:'Galera, na questão 3 da Lista 2 de Convecção, alguém achou Re = 4.8×10⁴? Quero confirmar se tá certo.',time:'3h',likes:3},
+  {id:3,name:'Maria Costa',channel:'geral',text:'Acabei de terminar o módulo de Condução no Scaff e confesso que o capítulo de Aletas é pesado! Dica: façam os exercícios do Incropera.',time:'5h',likes:8},
+  {id:4,name:'Lucas Ferreira',channel:'quimica',text:'Na P1 de Termodinâmica o professor costuma cobrar dedução da 2ª Lei? Ou só aplicação?',time:'6h',likes:2},
+  {id:5,name:'Julia Lima',channel:'calc',text:'Dica de ouro: pra Integrais de Superfície, assistam a playlist do Prof. Grings no YouTube. Mudou minha vida.',time:'8h',likes:12},
+  {id:6,name:'Rafael Almeida',channel:'fisica',text:'Pessoal, montei um resumo de todas as correlações de Nusselt do Incropera. Posso compartilhar aqui?',time:'12h',likes:15},
+  {id:7,name:'Camila Souza',channel:'geral',text:'Primeira vez usando o Scaff e já organizei todas as 18 semanas de Transferência de Calor. App top! 🚀',time:'1d',likes:20},
+];
+let communityChannel='todos';
+function getUserPosts(){return loadData('community_posts',[])}
+function saveUserPosts(posts){saveData('community_posts',posts)}
+function getPostLikes(){return loadData('post_likes',{})}
+function toggleLike(postId){
+  const likes=getPostLikes();
+  likes[postId]=!likes[postId];
+  saveData('post_likes',likes);
+  renderCommunity();
+}
+function addCommunityPost(){
+  const ta=document.getElementById('comm-input');if(!ta)return;
+  const text=ta.value.trim();if(!text)return;
+  const user=document.getElementById('topbar-username').textContent||'Aluno';
+  const posts=getUserPosts();
+  posts.unshift({id:Date.now(),name:user,channel:communityChannel==='todos'?'geral':communityChannel,text,time:'agora',likes:0});
+  saveUserPosts(posts);
+  ta.value='';
+  renderCommunity();
+}
+function renderCommunity(){
+  const panel=document.getElementById('panel-community');if(!panel)return;
+  const channels=['todos','geral','calc','fisica','quimica'];
+  const channelLabels={todos:'Todos',geral:'📢 Geral',calc:'📊 Cálculo',fisica:'⚡ Física',quimica:'🧪 Química'};
+  const userPosts=getUserPosts();
+  const allPosts=[...userPosts,...MOCK_POSTS];
+  const filtered=communityChannel==='todos'?allPosts:allPosts.filter(p=>p.channel===communityChannel);
+  const likes=getPostLikes();
+  let html=`<div class="comm-header fade-up"><div class="comm-title">💬 Comunidade</div></div>`;
+  html+=`<div class="channel-chips fade-up">${channels.map(c=>
+    `<div class="channel-chip ${communityChannel===c?'active':''}" onclick="communityChannel='${c}';renderCommunity()">${channelLabels[c]}</div>`).join('')}</div>`;
+  html+=`<div class="post-compose fade-up" style="margin-top:16px">
+    <div class="post-avatar" style="background:var(--coral);font-size:11px">${(document.getElementById('topbar-username')?.textContent||'A').charAt(0).toUpperCase()}</div>
+    <textarea id="comm-input" placeholder="Compartilhe uma dúvida ou material..."></textarea>
+    <button class="post-compose-btn" onclick="addCommunityPost()">Postar</button></div>`;
+  filtered.forEach(p=>{
+    const initials=p.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const color=AVATAR_COLORS[p.name.length%AVATAR_COLORS.length];
+    const isLiked=likes[p.id];
+    const likeCount=p.likes+(isLiked?1:0);
+    html+=`<div class="post-card fade-up">
+      <div class="post-header">
+        <div class="post-avatar" style="background:${color}">${initials}</div>
+        <div class="post-name">${esc(p.name)}</div>
+        <span class="post-channel">${esc(channelLabels[p.channel]||p.channel)}</span>
+        <span class="post-time">${esc(p.time)}</span></div>
+      <div class="post-body">${esc(p.text)}</div>
+      <div class="post-actions">
+        <span class="post-action ${isLiked?'liked':''}" onclick="toggleLike(${p.id})">${isLiked?'❤️':'🤍'} ${likeCount}</span>
+        <span class="post-action">💬 Responder</span></div></div>`;
+  });
   panel.innerHTML=html;
 }
 
