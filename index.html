@@ -237,6 +237,33 @@ html.dark .sidebar-item.active{color:#ff8a74}
 .post-action:hover{color:var(--coral)}
 .post-action.liked{color:var(--coral);font-weight:700}
 
+/* Profile */
+.profile-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:200;display:none;align-items:center;justify-content:center}
+.profile-overlay.active{display:flex}
+.profile-card{background:var(--card-bg);border-radius:var(--r-lg);padding:32px;width:380px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.25);position:relative;transition:background .4s}
+.profile-close{position:absolute;top:12px;right:16px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);transition:color .15s}.profile-close:hover{color:var(--coral)}
+.profile-avatar-big{width:64px;height:64px;border-radius:50%;background:var(--coral);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;margin:0 auto 16px}
+.profile-title{text-align:center;font-size:1.1rem;font-weight:800;color:var(--teal);margin-bottom:16px}
+.profile-field{margin-bottom:12px}
+.profile-field label{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.profile-field input{width:100%;padding:8px 12px;border:1px solid var(--rule);border-radius:var(--r-sm);background:var(--paper2);font-family:var(--sans);font-size:13px;color:var(--ink);outline:none;transition:border-color .15s,background .4s,color .4s}
+.profile-field input:focus{border-color:var(--coral)}
+.profile-save{display:block;width:100%;padding:10px;border:none;border-radius:var(--r-sm);background:var(--coral);color:#fff;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;margin-top:16px;transition:background .15s}
+.profile-save:hover{background:var(--coral-dk)}
+.profile-saved{text-align:center;font-size:11px;color:var(--teal);font-weight:600;margin-top:8px;opacity:0;transition:opacity .3s}
+.profile-saved.show{opacity:1}
+
+/* Stats */
+.stats-section{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--r);padding:24px;margin-top:24px;transition:background .4s,border-color .4s}
+.stats-title{font-size:14px;font-weight:800;color:var(--teal);margin-bottom:16px}
+.stats-row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.stats-chart-wrap{flex:1;min-width:280px}
+.stats-chart-wrap canvas{width:100%;height:180px}
+.stats-numbers{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px}
+.stat-box{background:var(--paper2);border-radius:var(--r-sm);padding:12px 16px;flex:1;min-width:100px;text-align:center;transition:background .4s}
+.stat-box .sb-value{font-size:1.4rem;font-weight:800;color:var(--coral)}
+.stat-box .sb-label{font-size:10px;font-weight:600;color:var(--muted);margin-top:2px}
+
 /* Deadlines */
 .dl-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0}
 .dl-badge.red{background:rgba(232,85,62,.15);color:#E8553E;border:1px solid rgba(232,85,62,.3)}
@@ -361,13 +388,27 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(-
     <div class="tabs-bar" id="tabs-bar" role="tablist" aria-label="Disciplinas abertas"></div>
     <button class="tab-add-btn" title="Nova disciplina" onclick="openAddModal()" aria-label="Adicionar nova disciplina">+</button>
     <div class="topbar-right">
-      <span class="topbar-user" id="topbar-username">—</span>
+      <span class="topbar-user" id="topbar-username" onclick="openProfile()" style="cursor:pointer" title="Meu perfil">—</span>
       <button class="topbar-theme" onclick="exportProgress()" title="Exportar progresso" aria-label="Exportar progresso">📊</button>
       <button class="topbar-theme" onclick="toggleTheme()" id="theme-btn" aria-label="Alternar tema">🌙</button>
       <button class="topbar-logout" onclick="doLogout()">Sair</button>
     </div>
   </div>
   <div class="app-body" id="app-body"></div>
+</div>
+
+<!-- PROFILE -->
+<div class="profile-overlay" id="profile-overlay" onclick="if(event.target===this)closeProfile()">
+  <div class="profile-card">
+    <button class="profile-close" onclick="closeProfile()">&times;</button>
+    <div class="profile-avatar-big" id="profile-avatar">?</div>
+    <div class="profile-title">Meu Perfil</div>
+    <div class="profile-field"><label for="pf-name">Nome completo</label><input id="pf-name" placeholder="Seu nome"></div>
+    <div class="profile-field"><label for="pf-course">Curso</label><input id="pf-course" placeholder="Ex: Engenharia Mecânica"></div>
+    <div class="profile-field"><label for="pf-semester">Período</label><input id="pf-semester" placeholder="Ex: 5° Semestre"></div>
+    <button class="profile-save" onclick="saveProfile()">Salvar Perfil</button>
+    <div class="profile-saved" id="profile-saved">✅ Perfil salvo!</div>
+  </div>
 </div>
 
 <!-- ADD MODAL -->
@@ -615,14 +656,15 @@ function renderTabs(){
 /* ═══ APP BODY ═══ */
 function renderAppBody(){
   document.getElementById("app-body").innerHTML=`<div id="panel-dashboard" style="display:none;padding:44px 36px;background:var(--paper);flex:1;overflow-y:auto;transition:background .4s">
-    <div class="dash-greeting fade-up">Bem-vindo à Scaff ✦</div>
+    <div class="dash-greeting fade-up" id="dash-greeting">Bem-vindo à Scaff ✦</div>
     <p class="dash-sub fade-up delay-1">Suas disciplinas ativas — selecione para estudar</p>
     <div id="upcoming-area"></div>
-    <div class="dash-grid" id="dash-grid"></div></div>`
+    <div class="dash-grid" id="dash-grid"></div>
+    <div id="stats-area"></div></div>`
   +`<div class="global-panel" id="panel-schedule"></div>`
   +`<div class="global-panel" id="panel-community"></div>`
   +STATE.disciplines.map(d=>buildDiscPanel(d)).join("");
-  renderDashGrid();renderUpcoming()}
+  renderDashGrid();renderUpcoming();renderStats();loadProfileGreeting()}
 
 function renderDashGrid(){
   const g=document.getElementById("dash-grid");if(!g)return;
@@ -684,7 +726,7 @@ function filterSidebar(did,query){
 
 /* ═══ NAVIGATION ═══ */
 function hideAllPanels(){document.querySelectorAll('.disc-panel').forEach(p=>p.classList.remove('active'));document.getElementById('panel-dashboard').style.display='none';document.querySelectorAll('.global-panel').forEach(p=>p.classList.remove('active'))}
-function showDashboard(){STATE.activeDisc=null;STATE.activeGlobal=null;hideAllPanels();const d=document.getElementById('panel-dashboard');d.style.display='flex';d.style.flexDirection='column';renderDashGrid();renderUpcoming();renderTabs()}
+function showDashboard(){STATE.activeDisc=null;STATE.activeGlobal=null;hideAllPanels();const d=document.getElementById('panel-dashboard');d.style.display='flex';d.style.flexDirection='column';renderDashGrid();renderUpcoming();renderStats();loadProfileGreeting();renderTabs()}
 function showSchedule(){STATE.activeDisc=null;STATE.activeGlobal='schedule';hideAllPanels();document.getElementById('panel-schedule').classList.add('active');renderSchedule();renderTabs()}
 function showCommunity(){STATE.activeDisc=null;STATE.activeGlobal='community';hideAllPanels();document.getElementById('panel-community').classList.add('active');renderCommunity();renderTabs()}
 function openDisc(id){STATE.activeDisc=id;STATE.activeGlobal=null;hideAllPanels();const panel=document.getElementById("panel-"+id);if(panel)panel.classList.add("active");renderTabs();const last=STATE.activeWeeks[id];if(last)openWeek(id,last,false)}
@@ -924,6 +966,90 @@ function renderCommunity(){
         <span class="post-action">💬 Responder</span></div></div>`;
   });
   panel.innerHTML=html;
+}
+
+/* ═══ PROFILE ═══ */
+function getProfile(){return loadData('profile',{name:'',course:'',semester:''})}
+function openProfile(){
+  const p=getProfile();
+  document.getElementById('pf-name').value=p.name||'';
+  document.getElementById('pf-course').value=p.course||'';
+  document.getElementById('pf-semester').value=p.semester||'';
+  const av=document.getElementById('profile-avatar');
+  av.textContent=p.name?p.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase():'?';
+  document.getElementById('profile-overlay').classList.add('active');
+}
+function closeProfile(){document.getElementById('profile-overlay').classList.remove('active')}
+function saveProfile(){
+  const name=document.getElementById('pf-name').value.trim();
+  const course=document.getElementById('pf-course').value.trim();
+  const semester=document.getElementById('pf-semester').value.trim();
+  saveData('profile',{name,course,semester});
+  const av=document.getElementById('profile-avatar');
+  av.textContent=name?name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase():'?';
+  if(name){document.getElementById('topbar-username').textContent=name.split(' ')[0]}
+  loadProfileGreeting();
+  const msg=document.getElementById('profile-saved');
+  msg.classList.add('show');setTimeout(()=>msg.classList.remove('show'),2000);
+}
+function loadProfileGreeting(){
+  const p=getProfile(),g=document.getElementById('dash-greeting');
+  if(g&&p.name)g.textContent='Olá, '+p.name.split(' ')[0]+' ✦';
+}
+
+/* ═══ STATISTICS ═══ */
+function renderStats(){
+  const area=document.getElementById('stats-area');if(!area)return;
+  const totalHours=STATE.disciplines.reduce((s,d)=>s+getStudyTime(d.id),0);
+  const totalWeeks=STATE.disciplines.reduce((s,d)=>s+d.weeks.length,0);
+  const doneWeeks=STATE.disciplines.reduce((s,d)=>s+d.weeks.filter(w=>isWeekDone(d.id,w.num)).length,0);
+  const totalNotes=STATE.disciplines.reduce((s,d)=>s+d.weeks.filter(w=>hasNote(d.id,w.num)).length,0);
+  area.innerHTML=`<div class="stats-section fade-up">
+    <div class="stats-title">📊 Estatísticas de Estudo</div>
+    <div class="stats-row"><div class="stats-chart-wrap"><canvas id="stats-canvas" width="560" height="180"></canvas></div></div>
+    <div class="stats-numbers">
+      <div class="stat-box"><div class="sb-value">${formatStudyTime(totalHours)}</div><div class="sb-label">Horas totais</div></div>
+      <div class="stat-box"><div class="sb-value">${doneWeeks}/${totalWeeks}</div><div class="sb-label">Semanas concluídas</div></div>
+      <div class="stat-box"><div class="sb-value">${totalNotes}</div><div class="sb-label">Anotações</div></div>
+      <div class="stat-box"><div class="sb-value">${STATE.disciplines.length}</div><div class="sb-label">Disciplinas</div></div>
+    </div></div>`;
+  drawStatsChart();
+}
+function drawStatsChart(){
+  const canvas=document.getElementById('stats-canvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=canvas.offsetWidth*dpr;canvas.height=180*dpr;
+  ctx.scale(dpr,dpr);
+  const W=canvas.offsetWidth,H=180,pad=40,barW=Math.min(50,(W-pad*2)/(STATE.disciplines.length*2));
+  const isDark=document.documentElement.classList.contains('dark');
+  ctx.clearRect(0,0,W,H);
+  let maxVal=1;
+  STATE.disciplines.forEach(d=>{const h=getStudyTime(d.id)/60;if(h>maxVal)maxVal=h});
+  const barArea=W-pad*2,spacing=barArea/STATE.disciplines.length;
+  STATE.disciplines.forEach((d,i)=>{
+    const hours=getStudyTime(d.id)/60;
+    const pct=calcProgress(d.id);
+    const barH=Math.max(4,(hours/maxVal)*(H-60));
+    const x=pad+spacing*i+spacing/2-barW/2;
+    const y=H-30-barH;
+    ctx.fillStyle=d.color+'cc';
+    ctx.beginPath();
+    const r=4;
+    ctx.moveTo(x+r,y);ctx.lineTo(x+barW-r,y);ctx.quadraticCurveTo(x+barW,y,x+barW,y+r);
+    ctx.lineTo(x+barW,y+barH);ctx.lineTo(x,y+barH);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);
+    ctx.fill();
+    const pBarH=barH*(pct/100);
+    ctx.fillStyle=d.color;
+    ctx.fillRect(x,y+barH-pBarH,barW,pBarH);
+    ctx.fillStyle=isDark?'#b0a898':'#5a5750';
+    ctx.font='bold 9px Nunito,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText(d.code,x+barW/2,H-14);
+    ctx.fillStyle=isDark?'#d0c8b8':'#3a3530';
+    ctx.font='bold 10px Nunito,sans-serif';
+    ctx.fillText(hours>0?hours.toFixed(1)+'h':'0h',x+barW/2,y-6);
+  });
 }
 
 /* ═══ EXPORT PROGRESS ═══ */
