@@ -73,13 +73,11 @@ npx -y http-server . -p 8080
 
 Acesse `http://localhost:8080` no navegador.
 
-### Credenciais de teste
+### Credenciais de Teste
 
-| Usuário | Senha |
-|---------|-------|
-| `estudante` | `scaff2025` |
-| `wallace` | `deq2025` |
-| `admin` | `scaffadm` |
+Você tem duas opções para testar o aplicativo:
+1. **Modo Visitante (Demo):** Clique no botão "Explorar como Visitante (Demo)" na tela inicial. Todo o progresso será salvo apenas no seu navegador.
+2. **Conta Real:** Clique em "Criar conta", preencha um e-mail e senha, e seu progresso será salvo e sincronizado gratuitamente na nuvem via Firebase Firestore.
 
 ## 🏗️ Arquitetura
 
@@ -126,5 +124,5 @@ Este projeto é de uso acadêmico e pessoal.
 ---
 
 <p align="center">
-  <sub>Feito com ☕ por <strong>Kalebe</strong> · UFC · Engenharia Química</sub>
+  <sub>Feito com ☕ por <strong>Kalebe</strong> · UFC · Engenharia de Energias Renováveis</sub>
 </p>
