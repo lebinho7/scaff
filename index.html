@@ -3215,9 +3215,21 @@
           
           let tooltip = locked ? `Bloqueada. Requer: ${it.req.join(', ')}` : `Carga Horária: ${it.ch}`;
           
+          let reqHtml = '';
+          if (it.req && it.req.length > 0) {
+            reqHtml = `<div style="font-size:10.5px;color:rgba(255,255,255,0.4);margin-top:4px;font-weight:400">Pré-req: ` + it.req.map(r => {
+              let rDone = false;
+              for (const s of curriculum) { const f = s.items.find(i=>i.name===r); if (f && f.status==='done') rDone=true; }
+              return `<span style="color:${rDone?'var(--teal)':'var(--coral)'}">${esc(r)}</span>`;
+            }).join(', ') + `</div>`;
+          }
+
           html += `<div class="curr-item ${locked ? 'locked' : ''}" title="${esc(tooltip)}">
             <div class="curr-status ${stClass}" style="${!locked ? 'cursor:pointer' : ''}" ${!locked ? `onclick="toggleCurrStatus(${idx}, ${iidx})"` : ''} title="Mudar status">${stElement}</div>
-            <div class="curr-name">${esc(it.name)}</div>
+            <div class="curr-name" style="flex:1;display:flex;flex-direction:column">
+              <span>${esc(it.name)}</span>
+              ${reqHtml}
+            </div>
             <div class="curr-meta">${it.ch}</div>
           </div>`;
         });
