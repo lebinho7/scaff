@@ -2587,14 +2587,19 @@
     const db = firebase.firestore();
 
     /* ═══ CLOUD SYNC ═══ */
-    function updateSyncUI(status) {
+    function updateSyncUI(status, msg) {
       const el = document.getElementById('sync-status');
       if (!el) return;
       el.className = 'sync-indicator';
       if (status === 'demo') { el.innerHTML = '🛑 Modo Demo (Local)'; el.classList.add('demo'); }
       else if (status === 'syncing') { el.innerHTML = '⏳ Sincronizando...'; el.classList.add('syncing'); }
       else if (status === 'saved') { el.innerHTML = '☁️ Salvo na Nuvem'; el.classList.add('saved'); }
-      else if (status === 'error') { el.innerHTML = '⚠️ Erro de Sync'; }
+      else if (status === 'error') { 
+        el.innerHTML = '⚠️ Erro de Sync'; 
+        if (msg) el.title = msg; 
+        console.error("Scaff Sync Alert:", msg);
+        alert("Erro no Firebase Sync: " + msg);
+      }
     }
 
     async function syncFromCloud() {
@@ -2612,7 +2617,7 @@
         } else {
           updateSyncUI('saved');
         }
-      } catch (e) { console.error('Sync load error:', e); updateSyncUI('error'); }
+      } catch (e) { console.error('Sync load error:', e); updateSyncUI('error', e.message); }
     }
 
     async function syncToCloud() {
@@ -2627,7 +2632,7 @@
         for (const k of keys) { const v = localStorage.getItem('scaff_' + k); if (v) data[k] = JSON.parse(v) }
         await db.collection('users_data').doc(STATE.currentUser.uid).set(data, { merge: true });
         updateSyncUI('saved');
-      } catch (e) { console.error('Sync save error:', e); updateSyncUI('error'); }
+      } catch (e) { console.error('Sync save error:', e); updateSyncUI('error', e.message); }
     }
 
     /* ═══ AUTH ═══ */
