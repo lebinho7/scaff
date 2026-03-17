@@ -2403,7 +2403,13 @@
     #reg-confirm {
       margin-bottom: 18px
     }
+
+    /* CSS para os marcadores customizados do mapa caso necessário */
+    .leaflet-popup-content-wrapper { border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .leaflet-popup-content { margin: 16px; }
   </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
@@ -2478,6 +2484,8 @@
             class="gs-icon">📅</span> Cronograma</button>
         <button class="gs-item" id="gs-nav-community" onclick="showCommunity()" aria-label="Comunidade"><span
             class="gs-icon">💬</span> Comunidade</button>
+        <button class="gs-item" id="gs-nav-explore" onclick="showExplore()" aria-label="Explorar Mapa"><span
+            class="gs-icon">🗺️</span> Explorar</button>
       </div>
       <div class="gs-nav" style="flex:0;margin-top:auto;padding-bottom:24px">
         <button class="gs-item" id="gs-nav-about" onclick="showAbout()" aria-label="Sobre o app"><span
@@ -2755,21 +2763,24 @@
         id: "te0418", code: "TE0418", color: "#1a3a2a", name: "Transferência de Calor e Massa", sem: "5° Semestre", book: "Incropera 7ª ed.", weeks: TE0418_WEEKS,
         ementa: { objetivos: "Capacitar o aluno a modelar e resolver problemas envolvendo a transferência de energia térmica nos modos de condução, convecção e radiação.", conteudo: "Introdução aos mecanismos de transferência de calor. Equação geral da condução térmica. Condução unidimensional em regime permanente. Aletas. Convecção forçada interna e externa. Convecção natural. Radiação térmica, leis fundamentais e fatores de forma.", bibliografia: ["Incropera, F.P. et al., Fundamentos de Transferência de Calor e Massa, 7ª Ed.", "Holman, J.P., Transferência de Calor, 10ª Ed."], avaliacao: "Três avaliações teóricas (P1, P2, P3) de mesmo peso. Nota final = (P1 + P2 + P3) / 3." },
         exams: [{ id: "p1-2024", label: "P1 — 2024.1", date: "2024-04-15", topics: "Convecção (Cap. 6–9)" }, { id: "p2-2024", label: "P2 — 2024.1", date: "2024-06-10", topics: "Condução (Cap. 2–5)" }, { id: "p3-2024", label: "P3 — 2024.1", date: "2024-07-08", topics: "Radiação (Cap. 12–13)" }, { id: "p1-2023", label: "P1 — 2023.2", date: "2023-10-20", topics: "Convecção" }, { id: "p2-2023", label: "P2 — 2023.2", date: "2023-12-05", topics: "Condução" }],
-        exercises: [{ id: "l1", label: "Lista 1 — Convecção Externa", cap: "Cap. 6–7" }, { id: "l2", label: "Lista 2 — Convecção Interna", cap: "Cap. 8" }, { id: "l3", label: "Lista 3 — Convecção Natural", cap: "Cap. 9" }, { id: "l4", label: "Lista 4 — Condução 1D", cap: "Cap. 2–3" }, { id: "l5", label: "Lista 5 — Aletas e Transiente", cap: "Cap. 3.6–5" }, { id: "l6", label: "Lista 6 — Radiação", cap: "Cap. 12–13" }]
+        exercises: [{ id: "l1", label: "Lista 1 — Convecção Externa", cap: "Cap. 6–7" }, { id: "l2", label: "Lista 2 — Convecção Interna", cap: "Cap. 8" }, { id: "l3", label: "Lista 3 — Convecção Natural", cap: "Cap. 9" }, { id: "l4", label: "Lista 4 — Condução 1D", cap: "Cap. 2–3" }, { id: "l5", label: "Lista 5 — Aletas e Transiente", cap: "Cap. 3.6–5" }, { id: "l6", label: "Lista 6 — Radiação", cap: "Cap. 12–13" }],
+        location: { name: "Sala 102 - Bloco A, Edifício de Engenharia", schedule: "Segundas e Quartas, 14:00", coords: [-3.7439, -38.5746] }
       },
       {
         id: "mat201", code: "MAT201", color: "#2a4a6a", name: "Cálculo Diferencial e Integral III", sem: "3° Semestre", book: "Stewart 8ª ed.",
         weeks: ["Séries de Taylor", "Integrais Múltiplas", "Campos Vetoriais", "Teorema de Green", "Integrais de Linha", "Teorema de Stokes", "Integrais de Superfície", "Equações Diferenciais", "Transformada de Laplace", "Séries de Fourier", "Equações a Derivadas Parciais", "Método da Separação", "Revisão Integrada A", "Prova Final"].map((t, i) => ({ num: String(i + 1).padStart(2, "0"), mod: i < 5 ? "A" : i < 10 ? "B" : "C", title: t, cap: `Cap. ${i + 1}` })),
         ementa: { objetivos: "Fornecer os conceitos fundamentais de cálculo em várias variáveis e equações diferenciais para aplicações em física e engenharia.", conteudo: "Integrais duplas e triplas. Aplicações a cálculo de áreas e volumes. Campos vetoriais. Integrais de linha e superfície. Teoremas de Green, Stokes e Gauss. Equações diferenciais ordinárias de 1ª e 2ª ordem constante.", bibliografia: ["Stewart, J., Cálculo - Volume II, 8ª Ed.", "Guidorizzi, H. L., Um Curso de Cálculo - Vol. 3"], avaliacao: "Duas provas presenciais e uma Prova Final para os alunos que não alcançarem a média 7.0." },
         exams: [{ id: "p1-mat", label: "P1 — 2024.1", date: "2024-04-18", topics: "Séries e Integrais Múltiplas" }, { id: "p2-mat", label: "P2 — 2024.1", date: "2024-06-13", topics: "Campos e Teoremas" }, { id: "pf-mat", label: "Prova Final — 2024.1", date: "2024-07-11", topics: "Todo o conteúdo" }],
-        exercises: [{ id: "l1-mat", label: "Lista 1 — Séries", cap: "Cap. 1–2" }, { id: "l2-mat", label: "Lista 2 — Integrais Duplas", cap: "Cap. 3–4" }, { id: "l3-mat", label: "Lista 3 — Integrais de Linha", cap: "Cap. 5–7" }, { id: "l4-mat", label: "Lista 4 — Fourier e EDPs", cap: "Cap. 10–12" }]
+        exercises: [{ id: "l1-mat", label: "Lista 1 — Séries", cap: "Cap. 1–2" }, { id: "l2-mat", label: "Lista 2 — Integrais Duplas", cap: "Cap. 3–4" }, { id: "l3-mat", label: "Lista 3 — Integrais de Linha", cap: "Cap. 5–7" }, { id: "l4-mat", label: "Lista 4 — Fourier e EDPs", cap: "Cap. 10–12" }],
+        location: { name: "Edifício de Exatas - Auditório B", schedule: "Terças e Quintas, 10:00", coords: [-3.7445, -38.5755] }
       },
       {
         id: "qui301", code: "QUI301", color: "#c8502a", name: "Termodinâmica Química", sem: "4° Semestre", book: "Smith, Van Ness & Abbott",
         weeks: ["1ª Lei", "2ª Lei", "Propriedades PVT", "Equações de Estado", "Propriedades Calóricas", "Equilíbrio de Fases", "Regra de Fases", "Diagramas PT e PV", "Equilíbrio Líq-Vap", "Soluções Ideais", "Soluções Reais", "Fugacidade", "Equilíbrio Químico", "Energia de Gibbs", "Revisão Termodinâmica", "Prova Final"].map((t, i) => ({ num: String(i + 1).padStart(2, "0"), mod: i < 6 ? "I" : i < 12 ? "II" : "III", title: t, cap: `Cap. ${i + 1}` })),
         ementa: { objetivos: "Aplicar os princípios termodinâmicos para interpretar e prever o comportamento de fases e o equilíbrio em sistemas multicomponentes reativos.", conteudo: "Primeira e Segunda Leis. Equações de estado para gases reais. Termodinâmica de soluções líquidas. Modelos de atividade. Equilíbrio líquido-vapor em misturas multicomponentes. Equilíbrio químico de reações.", bibliografia: ["Smith, J.M. et al., Introdução à Termodinâmica da Engenharia Química, 8ª Ed.", "Sandler, S.I., Chemical, Biochemical, and Engineering Thermodynamics"], avaliacao: "Média baseada em duas provas teóricas (P1 e P2) e entrega de 3 relatórios computacionais de cálculo termodinâmico." },
         exams: [{ id: "p1-qui", label: "P1 — 2024.1", date: "2024-04-22", topics: "1ª/2ª Lei e PVT" }, { id: "p2-qui", label: "P2 — 2024.1", date: "2024-06-17", topics: "Equilíbrio e Soluções" }],
-        exercises: [{ id: "l1-qui", label: "Lista 1 — Leis da Termodinâmica", cap: "Cap. 1–2" }, { id: "l2-qui", label: "Lista 2 — Equilíbrio", cap: "Cap. 6–9" }, { id: "l3-qui", label: "Lista 3 — Fugacidade", cap: "Cap. 10–12" }]
+        exercises: [{ id: "l1-qui", label: "Lista 1 — Leis da Termodinâmica", cap: "Cap. 1–2" }, { id: "l2-qui", label: "Lista 2 — Equilíbrio", cap: "Cap. 6–9" }, { id: "l3-qui", label: "Lista 3 — Fugacidade", cap: "Cap. 10–12" }],
+        location: { name: "Edifício de Química - Lab 3", schedule: "Sextas, 08:00", coords: [-3.7448, -38.5738] }
       },
     ];
     const STATE = { disciplines: [...DEFAULT_DISCIPLINES], activeDisc: null, activeWeeks: {}, selectedColor: "#1a3a2a", activeGlobal: null, discView: {}, currentUser: null };
@@ -2892,6 +2903,7 @@
       if (STATE.activeGlobal === 'schedule') { const el = document.getElementById('gs-nav-schedule'); if (el) el.classList.add('active') }
       else if (STATE.activeGlobal === 'community') { const el = document.getElementById('gs-nav-community'); if (el) el.classList.add('active') }
       else if (STATE.activeGlobal === 'about') { const el = document.getElementById('gs-nav-about'); if (el) el.classList.add('active') }
+      else if (STATE.activeGlobal === 'explore') { const el = document.getElementById('gs-nav-explore'); if (el) el.classList.add('active') }
       else if (!STATE.activeDisc) { const el = document.getElementById('gs-nav-home'); if (el) el.classList.add('active') }
     }
 
@@ -2905,6 +2917,7 @@
     <div id="stats-area"></div></div>`
         + `<div class="global-panel" id="panel-schedule"></div>`
         + `<div class="global-panel" id="panel-community"></div>`
+        + `<div class="global-panel" id="panel-explore"></div>`
         + `<div class="global-panel" id="panel-about"></div>`
         + STATE.disciplines.map(d => buildDiscPanel(d)).join("");
       renderDashGrid(); renderUpcoming(); renderStats(); loadProfileGreeting()
@@ -2982,6 +2995,44 @@
     function showSchedule() { STATE.activeDisc = null; STATE.activeGlobal = 'schedule'; hideAllPanels(); document.getElementById('panel-schedule').classList.add('active'); renderSchedule(); renderTabs(); updateGlobalSidebar() }
     function showCommunity() { STATE.activeDisc = null; STATE.activeGlobal = 'community'; hideAllPanels(); document.getElementById('panel-community').classList.add('active'); if (STATE.currentUser && !STATE.currentUser.email?.endsWith('@demo')) { listenCommunity(); } else { globalPosts = MOCK_POSTS; } renderCommunity(); renderTabs(); updateGlobalSidebar() }
     function showAbout() { STATE.activeDisc = null; STATE.activeGlobal = 'about'; hideAllPanels(); document.getElementById('panel-about').classList.add('active'); renderAbout(); renderTabs(); updateGlobalSidebar() }
+    
+    let _mapInstance = null;
+    function showExplore() {
+      STATE.activeDisc = null; STATE.activeGlobal = 'explore'; hideAllPanels();
+      const panel = document.getElementById('panel-explore'); if (panel) panel.classList.add('active');
+      renderExplore(); renderTabs(); updateGlobalSidebar();
+    }
+    
+    function renderExplore() {
+      const p = document.getElementById('panel-explore'); if (!p) return;
+      if (!p.innerHTML.trim()) {
+        p.innerHTML = `<div class="fade-up" style="flex:1;display:flex;flex-direction:column;padding:36px;background:var(--paper);height:100%">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:32px;color:var(--ink);margin-bottom:24px;">Seus Locais de Aula: Campus Central</div>
+          <div id="campus-map" style="flex:1;border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,0.05);overflow:hidden;min-height:400px;z-index:1;"></div>
+        </div>`;
+      }
+      setTimeout(() => {
+        if (!_mapInstance && typeof L !== 'undefined') {
+          _mapInstance = L.map('campus-map').setView([-3.7445, -38.5746], 17);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(_mapInstance);
+          STATE.disciplines.forEach(d => {
+            if (d.location && d.location.coords) {
+              const mkHtml = `<div style="background:${esc(d.color)};width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,0.3)"></div><div style="font-weight:bold;font-size:10px;text-align:center;color:${esc(d.color)};margin-top:2px;">${esc(d.code)}</div>`;
+              const icon = L.divIcon({ html: mkHtml, className: '', iconSize: [28, 40], iconAnchor: [12, 28], popupAnchor: [0, -28] });
+              L.marker(d.location.coords, { icon }).addTo(_mapInstance).bindPopup(`<div style="font-family:Inter,sans-serif;text-align:center;">
+                <div style="font-weight:700;font-size:14px;color:${esc(d.color)};margin-bottom:4px;">${esc(d.name)} (${esc(d.code)})</div>
+                <div style="font-size:12px;color:#333;margin-bottom:2px;">${esc(d.location.name)}</div>
+                <div style="font-size:11px;color:#666;">${esc(d.location.schedule)}</div>
+                </div>`);
+            }
+          });
+        }
+        if (_mapInstance) {
+          _mapInstance.invalidateSize();
+        }
+      }, 50);
+    }
+
     function openDisc(id) { STATE.activeDisc = id; STATE.activeGlobal = null; hideAllPanels(); const panel = document.getElementById("panel-" + id); if (panel) panel.classList.add("active"); renderTabs(); updateGlobalSidebar(); const last = STATE.activeWeeks[id]; if (last) openWeek(id, last, false) }
     function closeDisc(id) { if (!confirm('Remover ' + id.toUpperCase() + ' da sessão?')) return; STATE.disciplines = STATE.disciplines.filter(d => d.id !== id); if (STATE.activeDisc === id) STATE.activeDisc = null; renderTabs(); updateGlobalSidebar(); renderAppBody(); showDashboard() }
     function openWeek(did, wn, scroll = true) {
