@@ -2409,24 +2409,34 @@
     .leaflet-popup-content { margin: 16px; }
 
     /* CURRICULUM */
-    .curr-header { display:flex; flex-direction:column; gap:8px; padding:0 0 24px; border-bottom:1px solid var(--rule); margin-bottom:24px }
+    .curr-header { display:flex; flex-direction:column; gap:8px; padding:0 0 24px; margin-bottom:12px }
     .curr-title { font-size:32px; font-weight:800; font-family:'Cormorant Garamond', serif; color:var(--ink) }
     .curr-sub { font-size:14px; color:var(--muted) }
+    
+    .curr-summary { background:var(--card-bg); border-radius:var(--r); padding:32px; box-shadow:0 8px 30px rgba(0,0,0,0.03); border:1px solid var(--rule); margin-bottom:32px; display:flex; flex-direction:column; gap:16px }
+    .cs-title { font-size:18px; font-weight:800; color:var(--ink); display:flex; justify-content:space-between; align-items:flex-end }
+    .cs-pct { font-size:24px; color:var(--teal) }
+    .cs-bar { height:10px; background:var(--bg); border-radius:5px; overflow:hidden }
+    .cs-fill { height:100%; background:var(--teal); border-radius:5px; transition:width 1s cubic-bezier(0.16, 1, 0.3, 1) }
+    .cs-stats { display:flex; gap:32px; font-size:13px; color:var(--muted); flex-wrap:wrap }
+    .cs-stat strong { color:var(--ink); font-weight:800; font-size:16px; margin-right:4px }
+
     .curr-grid { display:grid; grid-template-columns:1fr; gap:24px; }
     @media(min-width:1000px) { .curr-grid { grid-template-columns:1fr 1fr } }
     .curr-semester { background:var(--card-bg); border-radius:var(--r); padding:24px; box-shadow:0 4px 16px rgba(0,0,0,0.03); border:1px solid var(--rule) }
     .curr-sem-title { font-size:15px; font-weight:700; color:var(--ink); margin-bottom:20px; display:flex; justify-content:space-between; align-items:center }
     .curr-sem-badge { font-size:11px; background:var(--bg); color:var(--muted); padding:4px 10px; border-radius:12px; font-family:var(--font-mono); font-weight:600 }
-    .curr-item { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--bg); border-radius:8px; margin-bottom:8px; font-size:13px; color:var(--ink); border:1px solid transparent; transition:border 0.2s }
-    .curr-item:hover { border-color:var(--rule) }
+    .curr-item { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--bg); border-radius:8px; margin-bottom:8px; font-size:13px; color:var(--ink); border:1px solid transparent; transition:transform 0.2s }
+    .curr-item:hover { transform:translateX(4px) }
     .curr-item:last-child { margin-bottom:0 }
     .curr-name { font-weight:600; flex:1 }
     .curr-meta { font-family:var(--font-mono); font-size:11px; color:var(--muted); margin-left:12px; text-align:right }
     .curr-status { width:10px; height:10px; border-radius:50%; margin-right:12px; flex-shrink:0 }
     .curr-status.done { background:var(--teal) }
     .curr-status.doing { background:var(--coral) }
-    .curr-status.todo { background:var(--rule); border: 2px solid var(--muted); background: transparent }
-    .curr-legend { display:flex; gap:20px; margin-bottom:32px; font-size:13px; font-weight:600; align-items:center }
+    .curr-status.todo { border: 2px solid var(--muted); background: transparent }
+    
+    .curr-legend { display:flex; gap:24px; margin-bottom:24px; font-size:13px; font-weight:600; align-items:center; padding: 0 16px }
     .curr-leg-item { display:flex; align-items:center; gap:8px; color:var(--muted) }
   </style>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -3032,64 +3042,94 @@
       const courseStr = getProfile().course || 'Engenharia de Energias Renováveis';
       
       const mockSemesters = [
-        { title: "1º Semestre", totalHours: 416, items: [
-          { name: "Cálculo Diferencial e Integral I", ch: "96h", status: "done" },
-          { name: "Física Geral I", ch: "64h", status: "done" },
-          { name: "Álgebra Linear", ch: "64h", status: "done" },
-          { name: "Química Geral", ch: "64h", status: "done" },
-          { name: "Introdução à Engenharia", ch: "32h", status: "done" },
-          { name: "Geometria Analítica", ch: "64h", status: "done" },
-          { name: "Física Experimental I", ch: "32h", status: "done" }
+        { title: "1º Semestre (Integralizado)", totalHours: 352, items: [
+          { name: "Cálculo I", ch: "64h", status: "done" },
+          { name: "Física para Engenharia I", ch: "64h", status: "done" },
+          { name: "Álgebra Linear para Engenharia", ch: "64h", status: "done" },
+          { name: "Fundamentos e Expressão Gráfica de Projetos", ch: "64h", status: "done" },
+          { name: "Metodologia Científica e Tecnológica", ch: "32h", status: "done" },
+          { name: "Fundamentos de Administração e Economia", ch: "32h", status: "done" },
+          { name: "Introdução à Engenharia de Energias Renováveis", ch: "32h", status: "done" }
         ]},
-        { title: "2º Semestre", totalHours: 416, items: [
-          { name: "Cálculo Diferencial e Integral II", ch: "96h", status: "done" },
-          { name: "Física Geral II", ch: "64h", status: "done" },
-          { name: "Programação de Computadores", ch: "64h", status: "done" },
-          { name: "Química Experimental", ch: "32h", status: "done" },
-          { name: "Desenho Técnico", ch: "64h", status: "done" },
-          { name: "Física Experimental II", ch: "32h", status: "done" },
-          { name: "Metodologia Científica", ch: "64h", status: "done" }
+        { title: "2º Semestre (Integralizado)", totalHours: 352, items: [
+          { name: "Cálculo II", ch: "64h", status: "done" },
+          { name: "Física para Engenharia II", ch: "64h", status: "done" },
+          { name: "Programação Computacional", ch: "64h", status: "done" },
+          { name: "Química Aplicada à Engenharia", ch: "64h", status: "done" },
+          { name: "Química Experimental para Engenharia", ch: "32h", status: "done" },
+          { name: "Engenharia Ambiental", ch: "32h", status: "done" },
+          { name: "Segurança e Saúde Ocupacional", ch: "32h", status: "done" }
         ]},
-        { title: "3º Semestre", totalHours: 416, items: [
-          { name: "Cálculo Diferencial e Integral III", ch: "64h", status: "doing" },
-          { name: "Física Geral III", ch: "64h", status: "doing" },
-          { name: "Termodinâmica I", ch: "64h", status: "doing" },
-          { name: "Mecânica Racional", ch: "64h", status: "doing" },
-          { name: "Eq. Diferenciais Ordinárias", ch: "64h", status: "doing" },
-          { name: "Física Experimental III", ch: "32h", status: "todo" },
-          { name: "Ciência dos Materiais", ch: "64h", status: "todo" }
+        { title: "3º Semestre (Integralizado)", totalHours: 384, items: [
+          { name: "Cálculo III", ch: "64h", status: "done" },
+          { name: "Equações Diferenciais Aplicadas", ch: "64h", status: "done" },
+          { name: "Probabilidade e Estatística para Engenharia", ch: "64h", status: "done" },
+          { name: "Princípios de Eletricidade e Magnetismo", ch: "64h", status: "done" },
+          { name: "Ciência dos Materiais", ch: "64h", status: "done" },
+          { name: "Laboratório de Eletricidade", ch: "32h", status: "done" },
+          { name: "Experimentos de Física", ch: "32h", status: "done" }
         ]},
-        { title: "4º Semestre", totalHours: 352, items: [
-          { name: "Transferência de Calor e Massa", ch: "64h", status: "todo" },
-          { name: "Mecânica dos Fluidos", ch: "96h", status: "todo" },
-          { name: "Termodinâmica Química", ch: "64h", status: "todo" },
-          { name: "Resistência dos Materiais", ch: "64h", status: "todo" },
-          { name: "Eletrotécnica", ch: "64h", status: "todo" }
+        { title: "4º Semestre (Integralizado)", totalHours: 384, items: [
+          { name: "Métodos Numéricos para Engenharia", ch: "64h", status: "done" },
+          { name: "Termodinâmica Aplicada", ch: "64h", status: "done" },
+          { name: "Mecânica dos Sólidos", ch: "64h", status: "done" },
+          { name: "Dinâmica dos Fluidos I", ch: "64h", status: "done" },
+          { name: "Princípios de Processos Químicos e Bioquímicos", ch: "64h", status: "done" },
+          { name: "Eletrotécnica Industrial", ch: "32h", status: "done" },
+          { name: "Laboratório de Eletrotécnica Industrial", ch: "32h", status: "done" }
         ]},
-        { title: "5º Semestre", totalHours: 352, items: [
-          { name: "Energia Solar Celular", ch: "64h", status: "todo" },
-          { name: "Energia Eólica I", ch: "64h", status: "todo" },
-          { name: "Máquinas Térmicas", ch: "64h", status: "todo" },
-          { name: "Eletrônica Aplicada", ch: "64h", status: "todo" },
-          { name: "Sistemas de Controle", ch: "96h", status: "todo" }
+        { title: "5º Semestre (Matriculado)", totalHours: 384, items: [
+          { name: "Transmissão de Calor", ch: "64h", status: "doing" },
+          { name: "Análise de Sistemas Térmicos", ch: "64h", status: "doing" },
+          { name: "Máquinas de Fluxo", ch: "64h", status: "doing" },
+          { name: "Filmes Finos de Semicondutores", ch: "64h", status: "doing" },
+          { name: "Circuitos Elétricos para Energias Renováveis II", ch: "64h", status: "doing" },
+          { name: "Projeto Integrador I", ch: "64h", status: "doing" }
+        ]},
+        { title: "6º Semestre (A Cursar)", totalHours: 384, items: [
+          { name: "Princípios de Conversão Eletromecânica", ch: "64h", status: "todo" },
+          { name: "Biomassa e Biocombustíveis", ch: "64h", status: "todo" },
+          { name: "Energia Eólica", ch: "64h", status: "todo" },
+          { name: "Energia Solar Térmica", ch: "64h", status: "todo" },
+          { name: "Mecanismos e Dinâmica das Máquinas", ch: "64h", status: "todo" },
+          { name: "Transmissão de Calor e Mecânica dos Computacional", ch: "64h", status: "todo" }
+        ]},
+        { title: "Trabalhos e Extensões", totalHours: 120, items: [
+          { name: "Estágio Supervisionado", ch: "160h", status: "todo" },
+          { name: "Atividades Complementares", ch: "64h", status: "todo" },
+          { name: "Projeto Final de Curso", ch: "64h", status: "todo" },
+          { name: "Ação Extensionista", ch: "120h", status: "done" }
         ]}
       ];
 
-      let html = `<div class="fade-up" style="flex:1;padding:48px;background:var(--paper);overflow-y:auto">
+      const pct = ((1568 / 3600) * 100).toFixed(1);
+
+      let html = `<div class="fade-up" style="flex:1;padding:48px;background:var(--paper);overflow-y:auto;overflow-x:hidden">
         <div class="curr-header">
           <div class="curr-title">Percurso Curricular</div>
-          <div class="curr-sub">${esc(courseStr)} — Histórico Grade Curricular</div>
+          <div class="curr-sub">${esc(courseStr)}</div>
         </div>
         
-        <div class="curr-legend">
-          <div class="curr-leg-item"><div class="curr-leg-dot curr-status done"></div> Concluída</div>
-          <div class="curr-leg-item"><div class="curr-leg-dot curr-status doing"></div> Matriculado</div>
-          <div class="curr-leg-item"><div class="curr-leg-dot curr-status todo"></div> A Cursar</div>
+        <div class="curr-summary fade-up delay-1">
+          <div class="cs-title">Progresso Base <span class="cs-pct">${pct}%</span></div>
+          <div class="cs-bar"><div class="cs-fill" style="width:0%" id="cs-fill-anim"></div></div>
+          <div class="cs-stats">
+            <div class="cs-stat"><strong>3600h</strong> Exigidas</div>
+            <div class="cs-stat"><strong>1568h</strong> Integralizadas</div>
+            <div class="cs-stat"><strong>2032h</strong> Pendentes</div>
+          </div>
         </div>
+
+        <div class="curr-legend fade-up delay-2">
+          <div class="curr-leg-item"><div class="curr-status done"></div> Integralizado</div>
+          <div class="curr-leg-item"><div class="curr-status doing"></div> Matriculado</div>
+          <div class="curr-leg-item"><div class="curr-status todo"></div> Pendente</div>
+        </div>
+        
         <div class="curr-grid">`;
 
       mockSemesters.forEach((sem, idx) => {
-        html += `<div class="curr-semester fade-up delay-${Math.min(idx+1, 5)}">
+        html += `<div class="curr-semester fade-up delay-${Math.min((idx+2), 5)}">
           <div class="curr-sem-title"><span>${esc(sem.title)}</span><span class="curr-sem-badge">${sem.totalHours}h totais</span></div>`;
         sem.items.forEach(it => {
           html += `<div class="curr-item" title="Carga Horária: ${it.ch}">
@@ -3102,6 +3142,12 @@
       });
       html += `</div></div>`;
       p.innerHTML = html;
+      
+      // Animação da barra de progresso
+      setTimeout(() => {
+        const fill = document.getElementById('cs-fill-anim');
+        if(fill) fill.style.width = pct + '%';
+      }, 50);
     }
 
     let _mapInstance = null;
