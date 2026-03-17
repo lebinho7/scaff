@@ -2587,25 +2587,22 @@
     const db = firebase.firestore();
 
     /* ═══ CLOUD SYNC ═══ */
+    let _syncRetries = 0;
+
     function updateSyncUI(status, msg) {
       const el = document.getElementById('sync-status');
       if (!el) return;
       el.className = 'sync-indicator';
-      if (status === 'demo') { el.innerHTML = '🛑 Modo Demo (Local)'; el.classList.add('demo'); }
-      else if (status === 'syncing') { el.innerHTML = '⏳ Sincronizando...'; el.classList.add('syncing'); }
-      else if (status === 'saved') { el.innerHTML = '☁️ Salvo na Nuvem'; el.classList.add('saved'); }
-      else if (status === 'error') { 
-        el.innerHTML = '⚠️ Erro de Sync'; 
-        if (msg) el.title = msg; 
-        console.error("Scaff Sync Alert:", msg);
-        alert("Erro no Firebase Sync: " + msg);
-      }
+      if (status === 'demo') { el.innerHTML = '🛑 Modo Demo (Local)'; el.classList.add('demo'); el.title = '';}
+      else if (status === 'syncing') { el.innerHTML = '⏳ Sincronizando...'; el.classList.add('syncing'); el.title = '';}
+      else if (status === 'saved') { el.innerHTML = '☁️ Salvo na Nuvem'; el.classList.add('saved'); el.title = '';_syncRetries=0;}
+      else if (status === 'local') { el.innerHTML = '💾 Salvo Localmente'; el.classList.add('demo'); el.title = msg||'Dados salvos localmente (sem nuvem)';}
+      else if (status === 'error') { el.innerHTML = '⚠️ Sem Nuvem'; el.classList.add('demo'); el.title = msg||'Falha na sincronização. Dados salvos localmente.'; console.warn('Scaff Sync:', msg);}
     }
 
     async function syncFromCloud() {
       if (!STATE.currentUser || STATE.currentUser.email?.endsWith('@demo')) {
-        updateSyncUI('demo');
-        return;
+        updateSyncUI('demo'); return;
       }
       updateSyncUI('syncing');
       try {
@@ -2613,26 +2610,46 @@
         if (doc.exists) {
           const data = doc.data();
           for (const k in data) localStorage.setItem('scaff_' + k, JSON.stringify(data[k]));
-          updateSyncUI('saved');
-        } else {
-          updateSyncUI('saved');
         }
-      } catch (e) { console.error('Sync load error:', e); updateSyncUI('error', e.message); }
+        updateSyncUI('saved');
+      } catch (e) {
+        console.warn('Sync load error:', e.code || e.message);
+        // Falha silenciosa: dados locais continuam validos
+        if (e.code === 'permission-denied' || e.code === 'PERMISSION_DENIED') {
+          updateSyncUI('local', 'Permissão negada no Firestore. Seus dados estão salvos localmente.');
+        } else {
+          updateSyncUI('local', e.message);
+        }
+      }
     }
 
     async function syncToCloud() {
       if (!STATE.currentUser || STATE.currentUser.email?.endsWith('@demo')) {
-        updateSyncUI('demo');
-        return;
+        updateSyncUI('demo'); return;
       }
       updateSyncUI('syncing');
       try {
         const keys = ['progress', 'notes', 'deadlines', 'studytime', 'profile', 'community_posts', 'post_likes'];
         const data = {};
-        for (const k of keys) { const v = localStorage.getItem('scaff_' + k); if (v) data[k] = JSON.parse(v) }
+        for (const k of keys) { const v = localStorage.getItem('scaff_' + k); if (v) data[k] = JSON.parse(v); }
         await db.collection('users_data').doc(STATE.currentUser.uid).set(data, { merge: true });
-        updateSyncUI('saved');
-      } catch (e) { console.error('Sync save error:', e); updateSyncUI('error', e.message); }
+        updateSyncUI('saved'); _syncRetries = 0;
+      } catch (e) {
+        console.warn('Sync save error:', e.code || e.message);
+        _syncRetries++;
+        if (_syncRetries <= 3) {
+          // Backoff exponencial: 4s, 8s, 16s
+          setTimeout(syncToCloud, Math.pow(2, _syncRetries + 1) * 1000);
+          updateSyncUI('syncing');
+        } else {
+          _syncRetries = 0;
+          if (e.code === 'permission-denied' || e.code === 'PERMISSION_DENIED') {
+            updateSyncUI('local', 'Permissão negada no Firestore. Configure as regras de segurança.');
+          } else {
+            updateSyncUI('local', e.message);
+          }
+        }
+      }
     }
 
     /* ═══ AUTH ═══ */
