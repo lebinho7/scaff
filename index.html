@@ -2517,6 +2517,8 @@
             class="gs-icon">📅</span> Cronograma</button>
         <button class="gs-item" id="gs-nav-curriculum" onclick="showCurriculum()" aria-label="Percurso Curricular"><span
             class="gs-icon">🎓</span> Curriculo</button>
+        <button class="gs-item" id="gs-nav-faltas" onclick="showFaltas()" aria-label="Contador de Faltas"><span
+            class="gs-icon">⚠️</span> Faltas</button>
         <button class="gs-item" id="gs-nav-community" onclick="showCommunity()" aria-label="Comunidade"><span
             class="gs-icon">💬</span> Comunidade</button>
         <button class="gs-item" id="gs-nav-explore" onclick="showExplore()" aria-label="Explorar Mapa"><span
@@ -2940,6 +2942,7 @@
       else if (STATE.activeGlobal === 'community') { const el = document.getElementById('gs-nav-community'); if (el) el.classList.add('active') }
       else if (STATE.activeGlobal === 'about') { const el = document.getElementById('gs-nav-about'); if (el) el.classList.add('active') }
       else if (STATE.activeGlobal === 'explore') { const el = document.getElementById('gs-nav-explore'); if (el) el.classList.add('active') }
+      else if (STATE.activeGlobal === 'faltas') { const el = document.getElementById('gs-nav-faltas'); if (el) el.classList.add('active') }
       else if (!STATE.activeDisc) { const el = document.getElementById('gs-nav-home'); if (el) el.classList.add('active') }
     }
 
@@ -2955,6 +2958,7 @@
         + `<div class="global-panel" id="panel-curriculum"></div>`
         + `<div class="global-panel" id="panel-community"></div>`
         + `<div class="global-panel" id="panel-explore"></div>`
+        + `<div class="global-panel" id="panel-faltas"></div>`
         + `<div class="global-panel" id="panel-about"></div>`
         + STATE.disciplines.map(d => buildDiscPanel(d)).join("");
       renderDashGrid(); renderUpcoming(); renderStats(); loadProfileGreeting()
@@ -3032,6 +3036,78 @@
     function showSchedule() { STATE.activeDisc = null; STATE.activeGlobal = 'schedule'; hideAllPanels(); document.getElementById('panel-schedule').classList.add('active'); renderSchedule(); renderTabs(); updateGlobalSidebar() }
     function showCommunity() { STATE.activeDisc = null; STATE.activeGlobal = 'community'; hideAllPanels(); document.getElementById('panel-community').classList.add('active'); if (STATE.currentUser && !STATE.currentUser.email?.endsWith('@demo')) { listenCommunity(); } else { globalPosts = MOCK_POSTS; } renderCommunity(); renderTabs(); updateGlobalSidebar() }
     function showAbout() { STATE.activeDisc = null; STATE.activeGlobal = 'about'; hideAllPanels(); document.getElementById('panel-about').classList.add('active'); renderAbout(); renderTabs(); updateGlobalSidebar() }
+    
+    function showFaltas() {
+      STATE.activeDisc = null; STATE.activeGlobal = 'faltas'; hideAllPanels();
+      const panel = document.getElementById('panel-faltas'); if (panel) panel.classList.add('active');
+      renderFaltas(); renderTabs(); updateGlobalSidebar();
+    }
+
+    function renderFaltas() {
+      const p = document.getElementById('panel-faltas'); if (!p) return;
+      const curriculum = getCurriculum();
+      const doing = [];
+      curriculum.forEach((sem, sIdx) => {
+        sem.items.forEach((it, iIdx) => {
+          if (it.status === 'doing') doing.push({ ...it, sIdx, iIdx });
+        });
+      });
+
+      let html = `<div class="fade-up" style="flex:1;padding:48px;background:var(--paper);overflow-y:auto">
+        <div class="curr-header">
+          <div class="curr-title">Controle de Faltas</div>
+          <div class="curr-sub">Gerencie suas ausências nas disciplinas do semestre atual</div>
+        </div>
+        
+        <div class="curr-grid">`;
+
+      if (doing.length === 0) {
+        html += `<div style="text-align:center;color:var(--muted);padding:80px;grid-column:1/-1">
+          <div style="font-size:48px;margin-bottom:16px">✅</div>
+          <div style="font-size:18px;font-weight:600">Nenhuma disciplina cursando</div>
+          <p style="font-size:14px;margin-top:8px">Marque disciplinas como "Matriculado" no seu currículo para acompanhá-las aqui.</p>
+          <button class="login-btn" style="margin-top:24px;width:auto;padding:12px 24px" onclick="showCurriculum()">Ir para Currículo</button>
+        </div>`;
+      } else {
+        doing.forEach(it => {
+          const f = it.faltas || 0;
+          const maxF = parseInt(it.ch) * 0.25;
+          const remaining = maxF - f;
+          const daysLeft = Math.floor(remaining / 2);
+          const pctFaltas = (f / maxF) * 100;
+          
+          html += `<div class="curr-semester fade-up" style="display:flex;flex-direction:column;gap:16px;padding:32px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div style="font-size:18px;font-weight:800;color:var(--ink)">${esc(it.name)}</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px">${it.ch} · Carga Horária Total</div>
+              </div>
+              <div style="text-align:right">
+                <div style="font-size:24px;font-weight:800;color:${f >= maxF*0.75 ? 'var(--coral)' : 'var(--ink)'}">${f}/${maxF}</div>
+                <div style="font-size:11px;color:var(--muted)">faltas totais</div>
+              </div>
+            </div>
+
+            <div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin:8px 0">
+              <div style="height:100%;width:${pctFaltas}%;background:${f >= maxF*0.75 ? 'var(--coral)' : 'var(--teal)'};transition:width 0.3s"></div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-size:13px;color:${remaining <= 4 ? 'var(--coral)' : 'var(--muted)'};font-weight:${remaining <= 4 ? '700' : '400'}">
+                ⚠️ Restam <strong>${remaining}</strong> faltas (${daysLeft} dias)
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="seg-btn" style="padding:8px 16px;min-width:44px" onclick="updateFaltas(${it.sIdx}, ${it.iIdx}, -1)">-</button>
+                <button class="seg-btn" style="padding:8px 16px;min-width:44px" onclick="updateFaltas(${it.sIdx}, ${it.iIdx}, 1)">+</button>
+              </div>
+            </div>
+          </div>`;
+        });
+      }
+
+      html += `</div></div>`;
+      p.innerHTML = html;
+    }
     
     function showCurriculum() {
       STATE.activeDisc = null; STATE.activeGlobal = 'curriculum'; hideAllPanels();
