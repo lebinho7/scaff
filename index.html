@@ -2670,7 +2670,7 @@
       }
       updateSyncUI('syncing');
       try {
-        const keys = ['progress', 'notes', 'deadlines', 'studytime', 'profile', 'community_posts', 'post_likes'];
+        const keys = ['progress', 'notes', 'deadlines', 'studytime', 'profile', 'community_posts', 'post_likes', 'curriculum'];
         const data = {};
         for (const k of keys) { const v = localStorage.getItem('scaff_' + k); if (v) data[k] = JSON.parse(v); }
         await db.collection('users_data').doc(STATE.currentUser.uid).set(data, { merge: true });
@@ -3037,72 +3037,94 @@
       renderCurriculum(); renderTabs(); updateGlobalSidebar();
     }
     
+    const DEFAULT_CURRICULUM = [
+      { title: "1º Semestre", totalHours: 352, items: [
+        { name: "Cálculo I", ch: "64h", status: "done" },
+        { name: "Física para Engenharia I", ch: "64h", status: "done" },
+        { name: "Álgebra Linear para Engenharia", ch: "64h", status: "done" },
+        { name: "Fundamentos e Expressão Gráfica de Projetos", ch: "64h", status: "done" },
+        { name: "Metodologia Científica e Tecnológica", ch: "32h", status: "done" },
+        { name: "Fundamentos de Administração e Economia", ch: "32h", status: "done" },
+        { name: "Introdução à Engenharia", ch: "32h", status: "done" }
+      ]},
+      { title: "2º Semestre", totalHours: 352, items: [
+        { name: "Cálculo II", ch: "64h", status: "done" },
+        { name: "Física para Engenharia II", ch: "64h", status: "done" },
+        { name: "Programação Computacional", ch: "64h", status: "done" },
+        { name: "Química Aplicada à Engenharia", ch: "64h", status: "done" },
+        { name: "Química Experimental para Engenharia", ch: "32h", status: "done" },
+        { name: "Engenharia Ambiental", ch: "32h", status: "done" },
+        { name: "Segurança e Saúde Ocupacional", ch: "32h", status: "done" }
+      ]},
+      { title: "3º Semestre", totalHours: 384, items: [
+        { name: "Cálculo III", ch: "64h", status: "done" },
+        { name: "Equações Diferenciais Aplicadas", ch: "64h", status: "done" },
+        { name: "Probabilidade e Estatística", ch: "64h", status: "done" },
+        { name: "Princípios de Eletricidade e Magnetismo", ch: "64h", status: "done" },
+        { name: "Ciência dos Materiais", ch: "64h", status: "done" },
+        { name: "Laboratório de Eletricidade", ch: "32h", status: "done" },
+        { name: "Experimentos de Física", ch: "32h", status: "done" }
+      ]},
+      { title: "4º Semestre", totalHours: 384, items: [
+        { name: "Métodos Numéricos para Engenharia", ch: "64h", status: "done" },
+        { name: "Termodinâmica Aplicada", ch: "64h", status: "done" },
+        { name: "Mecânica dos Sólidos", ch: "64h", status: "done" },
+        { name: "Dinâmica dos Fluidos I", ch: "64h", status: "done" },
+        { name: "Princípios de Processos Químicos", ch: "64h", status: "done" },
+        { name: "Eletrotécnica Industrial", ch: "32h", status: "done" },
+        { name: "Laboratório de Eletrotécnica", ch: "32h", status: "done" }
+      ]},
+      { title: "5º Semestre", totalHours: 384, items: [
+        { name: "Transmissão de Calor", ch: "64h", status: "doing" },
+        { name: "Análise de Sistemas Térmicos", ch: "64h", status: "doing" },
+        { name: "Máquinas de Fluxo", ch: "64h", status: "doing" },
+        { name: "Filmes Finos de Semicondutores", ch: "64h", status: "doing" },
+        { name: "Circuitos Elétricos para Renováveis II", ch: "64h", status: "doing" },
+        { name: "Projeto Integrador I", ch: "64h", status: "doing" }
+      ]},
+      { title: "6º Semestre", totalHours: 384, items: [
+        { name: "Princípios de Conversão Eletromecânica", ch: "64h", status: "todo" },
+        { name: "Biomassa e Biocombustíveis", ch: "64h", status: "todo" },
+        { name: "Energia Eólica", ch: "64h", status: "todo" },
+        { name: "Energia Solar Térmica", ch: "64h", status: "todo" },
+        { name: "Mecanismos e Dinâmica das Máquinas", ch: "64h", status: "todo" },
+        { name: "Transmissão de Calor Computacional", ch: "64h", status: "todo" }
+      ]},
+      { title: "Trabalhos e Extensões", totalHours: 408, items: [
+        { name: "Estágio Supervisionado", ch: "160h", status: "todo" },
+        { name: "Atividades Complementares", ch: "64h", status: "todo" },
+        { name: "Projeto Final de Curso", ch: "64h", status: "todo" },
+        { name: "Ação Extensionista", ch: "120h", status: "done" }
+      ]}
+    ];
+
+    function getCurriculum() { return loadData('curriculum', DEFAULT_CURRICULUM); }
+    function saveCurriculum(data) { saveData('curriculum', data); }
+    function toggleCurrStatus(semIdx, itemIdx) {
+      const c = getCurriculum();
+      const st = c[semIdx].items[itemIdx].status;
+      c[semIdx].items[itemIdx].status = st === 'todo' ? 'doing' : (st === 'doing' ? 'done' : 'todo');
+      saveCurriculum(c);
+      renderCurriculum();
+    }
+
     function renderCurriculum() {
       const p = document.getElementById('panel-curriculum'); if (!p) return;
       const courseStr = getProfile().course || 'Engenharia de Energias Renováveis';
       
-      const mockSemesters = [
-        { title: "1º Semestre (Integralizado)", totalHours: 352, items: [
-          { name: "Cálculo I", ch: "64h", status: "done" },
-          { name: "Física para Engenharia I", ch: "64h", status: "done" },
-          { name: "Álgebra Linear para Engenharia", ch: "64h", status: "done" },
-          { name: "Fundamentos e Expressão Gráfica de Projetos", ch: "64h", status: "done" },
-          { name: "Metodologia Científica e Tecnológica", ch: "32h", status: "done" },
-          { name: "Fundamentos de Administração e Economia", ch: "32h", status: "done" },
-          { name: "Introdução à Engenharia de Energias Renováveis", ch: "32h", status: "done" }
-        ]},
-        { title: "2º Semestre (Integralizado)", totalHours: 352, items: [
-          { name: "Cálculo II", ch: "64h", status: "done" },
-          { name: "Física para Engenharia II", ch: "64h", status: "done" },
-          { name: "Programação Computacional", ch: "64h", status: "done" },
-          { name: "Química Aplicada à Engenharia", ch: "64h", status: "done" },
-          { name: "Química Experimental para Engenharia", ch: "32h", status: "done" },
-          { name: "Engenharia Ambiental", ch: "32h", status: "done" },
-          { name: "Segurança e Saúde Ocupacional", ch: "32h", status: "done" }
-        ]},
-        { title: "3º Semestre (Integralizado)", totalHours: 384, items: [
-          { name: "Cálculo III", ch: "64h", status: "done" },
-          { name: "Equações Diferenciais Aplicadas", ch: "64h", status: "done" },
-          { name: "Probabilidade e Estatística para Engenharia", ch: "64h", status: "done" },
-          { name: "Princípios de Eletricidade e Magnetismo", ch: "64h", status: "done" },
-          { name: "Ciência dos Materiais", ch: "64h", status: "done" },
-          { name: "Laboratório de Eletricidade", ch: "32h", status: "done" },
-          { name: "Experimentos de Física", ch: "32h", status: "done" }
-        ]},
-        { title: "4º Semestre (Integralizado)", totalHours: 384, items: [
-          { name: "Métodos Numéricos para Engenharia", ch: "64h", status: "done" },
-          { name: "Termodinâmica Aplicada", ch: "64h", status: "done" },
-          { name: "Mecânica dos Sólidos", ch: "64h", status: "done" },
-          { name: "Dinâmica dos Fluidos I", ch: "64h", status: "done" },
-          { name: "Princípios de Processos Químicos e Bioquímicos", ch: "64h", status: "done" },
-          { name: "Eletrotécnica Industrial", ch: "32h", status: "done" },
-          { name: "Laboratório de Eletrotécnica Industrial", ch: "32h", status: "done" }
-        ]},
-        { title: "5º Semestre (Matriculado)", totalHours: 384, items: [
-          { name: "Transmissão de Calor", ch: "64h", status: "doing" },
-          { name: "Análise de Sistemas Térmicos", ch: "64h", status: "doing" },
-          { name: "Máquinas de Fluxo", ch: "64h", status: "doing" },
-          { name: "Filmes Finos de Semicondutores", ch: "64h", status: "doing" },
-          { name: "Circuitos Elétricos para Energias Renováveis II", ch: "64h", status: "doing" },
-          { name: "Projeto Integrador I", ch: "64h", status: "doing" }
-        ]},
-        { title: "6º Semestre (A Cursar)", totalHours: 384, items: [
-          { name: "Princípios de Conversão Eletromecânica", ch: "64h", status: "todo" },
-          { name: "Biomassa e Biocombustíveis", ch: "64h", status: "todo" },
-          { name: "Energia Eólica", ch: "64h", status: "todo" },
-          { name: "Energia Solar Térmica", ch: "64h", status: "todo" },
-          { name: "Mecanismos e Dinâmica das Máquinas", ch: "64h", status: "todo" },
-          { name: "Transmissão de Calor e Mecânica dos Computacional", ch: "64h", status: "todo" }
-        ]},
-        { title: "Trabalhos e Extensões", totalHours: 120, items: [
-          { name: "Estágio Supervisionado", ch: "160h", status: "todo" },
-          { name: "Atividades Complementares", ch: "64h", status: "todo" },
-          { name: "Projeto Final de Curso", ch: "64h", status: "todo" },
-          { name: "Ação Extensionista", ch: "120h", status: "done" }
-        ]}
-      ];
+      const curriculum = getCurriculum();
+      let totalH = 0, doneH = 0;
 
-      const pct = ((1568 / 3600) * 100).toFixed(1);
+      curriculum.forEach(sem => {
+        sem.items.forEach(it => {
+          let h = parseInt(it.ch) || 0;
+          totalH += h;
+          if (it.status === 'done') doneH += h;
+        });
+      });
+
+      const pendH = totalH - doneH;
+      const pct = totalH ? ((doneH / totalH) * 100).toFixed(1) : 0;
 
       let html = `<div class="fade-up" style="flex:1;padding:48px;background:var(--paper);overflow-y:auto;overflow-x:hidden">
         <div class="curr-header">
@@ -3114,9 +3136,9 @@
           <div class="cs-title">Progresso Base <span class="cs-pct">${pct}%</span></div>
           <div class="cs-bar"><div class="cs-fill" style="width:0%" id="cs-fill-anim"></div></div>
           <div class="cs-stats">
-            <div class="cs-stat"><strong>3600h</strong> Exigidas</div>
-            <div class="cs-stat"><strong>1568h</strong> Integralizadas</div>
-            <div class="cs-stat"><strong>2032h</strong> Pendentes</div>
+            <div class="cs-stat"><strong>${totalH}h</strong> Exigidas</div>
+            <div class="cs-stat" style="color:var(--teal)"><strong>${doneH}h</strong> Integralizadas</div>
+            <div class="cs-stat" style="color:var(--coral)"><strong>${pendH}h</strong> Pendentes</div>
           </div>
         </div>
 
@@ -3124,16 +3146,17 @@
           <div class="curr-leg-item"><div class="curr-status done"></div> Integralizado</div>
           <div class="curr-leg-item"><div class="curr-status doing"></div> Matriculado</div>
           <div class="curr-leg-item"><div class="curr-status todo"></div> Pendente</div>
+          <div style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:normal">💡 Clique nos círculos para alterar o status</div>
         </div>
         
         <div class="curr-grid">`;
 
-      mockSemesters.forEach((sem, idx) => {
+      curriculum.forEach((sem, idx) => {
         html += `<div class="curr-semester fade-up delay-${Math.min((idx+2), 5)}">
           <div class="curr-sem-title"><span>${esc(sem.title)}</span><span class="curr-sem-badge">${sem.totalHours}h totais</span></div>`;
-        sem.items.forEach(it => {
+        sem.items.forEach((it, iidx) => {
           html += `<div class="curr-item" title="Carga Horária: ${it.ch}">
-            <div class="curr-status ${it.status}"></div>
+            <div class="curr-status ${it.status}" style="cursor:pointer" onclick="toggleCurrStatus(${idx}, ${iidx})" title="Mudar status"></div>
             <div class="curr-name">${esc(it.name)}</div>
             <div class="curr-meta">${it.ch}</div>
           </div>`;
