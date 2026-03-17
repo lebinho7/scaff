@@ -29,21 +29,21 @@
       --gold: #feca57;
       --gold-lt: rgba(254, 202, 87, .15);
       --ink: #2d3436;
-      --paper: #f9f7f2;
+      --paper: #fdfaf5;
       --paper2: #f1ede4;
       --paper3: #e8e2d5;
       --card-bg: #ffffff;
-      --muted: #8395a7;
-      --rule: rgba(0, 0, 0, .06);
-      --rule2: rgba(0, 0, 0, .03);
+      --muted: #576574;
+      --rule: rgba(0, 0, 0, .08);
+      --rule2: rgba(0, 0, 0, .04);
       --shadow: 0 4px 24px rgba(0, 0, 0, .04);
       --shadow-lg: 0 16px 48px rgba(0, 0, 0, .08);
       --r: 20px;
       --r-sm: 12px;
       --sans: 'Inter', system-ui, -apple-system, sans-serif;
       --serif: 'Cormorant Garamond', serif;
-      --topbar-bg: #ffffff;
-      --sidebar-bg: #ffffff;
+      --topbar-bg: #fdfaf5;
+      --sidebar-bg: #fdfaf5;
     }
 
     html.dark {
@@ -53,13 +53,13 @@
       --paper3: #1d2028;
       --card-bg: #15171c;
       --muted: #a4b0be;
-      --rule: rgba(255, 255, 255, .06);
-      --rule2: rgba(255, 255, 255, .03);
+      --rule: rgba(255, 255, 255, .08);
+      --rule2: rgba(255, 255, 255, .04);
       --shadow: 0 4px 24px rgba(0, 0, 0, .4);
       --shadow-lg: 0 16px 48px rgba(0, 0, 0, .6);
       --topbar-bg: #0c0d10;
       --sidebar-bg: #0c0d10;
-      --coral-lt: rgba(255, 107, 107, .12);
+      --coral-lt: rgba(255, 107, 107, .15);
     }
 
     *,
@@ -484,9 +484,9 @@
       align-items: center;
       gap: 7px;
       padding: 0 16px;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
-      color: rgba(255, 255, 255, .65);
+      color: var(--muted);
       cursor: pointer;
       border-bottom: 3px solid transparent;
       white-space: nowrap;
@@ -502,9 +502,9 @@
     }
 
     .tab.active {
-      color: #fff;
-      border-bottom-color: var(--gold);
-      background: rgba(0, 0, 0, .10);
+      color: var(--ink);
+      border-bottom-color: var(--coral);
+      background: var(--paper2);
       font-weight: 700
     }
 
@@ -542,9 +542,9 @@
       height: 32px;
       margin: auto 6px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, .15);
-      border: 1.5px solid rgba(255, 255, 255, .25);
-      color: rgba(255, 255, 255, .8);
+      background: var(--paper2);
+      border: 1px solid var(--rule);
+      color: var(--ink);
       cursor: pointer;
       font-size: 20px;
       flex-shrink: 0;
@@ -569,13 +569,14 @@
 
     .sync-indicator {
       font-size: 12px;
-      color: rgba(255, 255, 255, .6);
+      color: var(--muted);
       display: flex;
       align-items: center;
       gap: 4px;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 12px;
-      background: rgba(0, 0, 0, .15);
+      background: var(--paper2);
+      border: 1px solid var(--rule);
       transition: all .3s
     }
 
@@ -604,9 +605,9 @@
     }
 
     .topbar-user {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
-      color: rgba(255, 255, 255, .6)
+      color: var(--muted)
     }
 
     .topbar-logout,
@@ -616,9 +617,9 @@
       letter-spacing: .06em;
       text-transform: uppercase;
       cursor: pointer;
-      color: rgba(255, 255, 255, .75);
-      background: rgba(0, 0, 0, .12);
-      border: 1.5px solid rgba(255, 255, 255, .2);
+      color: var(--ink);
+      background: var(--paper2);
+      border: 1px solid var(--rule);
       padding: 5px 12px;
       border-radius: 20px;
       transition: all .15s
@@ -626,9 +627,9 @@
 
     .topbar-logout:hover,
     .topbar-theme:hover {
-      color: #fff;
-      background: rgba(0, 0, 0, .22);
-      border-color: rgba(255, 255, 255, .4)
+      color: var(--coral);
+      background: var(--paper3);
+      border-color: var(--coral)
     }
 
     .app-body {
