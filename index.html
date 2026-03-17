@@ -21,49 +21,45 @@
   <style>
     :root {
       --coral: #ff6b6b;
-      --coral-dk: #ff5252;
-      --coral-lt: rgba(255, 107, 107, .12);
-      --teal: #1A5F6E;
-      --teal-dk: #124450;
-      --teal-lt: rgba(26, 95, 110, .08);
-      --gold: #E8C547;
-      --gold-lt: rgba(232, 197, 71, .18);
-      --ink: #1a1a1a;
-      --paper: #F7F3EC;
-      --paper2: #EDE8DF;
-      --paper3: #E2DDD3;
-      --card-bg: #fff;
-      --muted: #7a7870;
-      --rule: rgba(26, 26, 26, .11);
-      --rule2: rgba(26, 26, 26, .055);
-      --shadow: 0 4px 20px rgba(0, 0, 0, .05);
-      --shadow-lg: 0 12px 48px rgba(0, 0, 0, .08);
-      --r: 16px;
-      --r-sm: 8px;
-      --sans: 'Inter', system-ui, sans-serif;
+      --coral-dk: #ee5253;
+      --coral-lt: rgba(255, 107, 107, .08);
+      --teal: #2d3436;
+      --teal-dk: #1e272e;
+      --teal-lt: rgba(45, 52, 54, .05);
+      --gold: #feca57;
+      --gold-lt: rgba(254, 202, 87, .15);
+      --ink: #2d3436;
+      --paper: #f9f7f2;
+      --paper2: #f1ede4;
+      --paper3: #e8e2d5;
+      --card-bg: #ffffff;
+      --muted: #8395a7;
+      --rule: rgba(0, 0, 0, .06);
+      --rule2: rgba(0, 0, 0, .03);
+      --shadow: 0 4px 24px rgba(0, 0, 0, .04);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, .08);
+      --r: 20px;
+      --r-sm: 12px;
+      --sans: 'Inter', system-ui, -apple-system, sans-serif;
       --serif: 'Cormorant Garamond', serif;
-      --mono: 'Courier New', Courier, monospace;
-      --topbar-bg: var(--paper);
-      --viewer-bg: #1e1e1e;
-      --viewer-toolbar: #161616;
+      --topbar-bg: #ffffff;
+      --sidebar-bg: #ffffff;
     }
 
     html.dark {
-      --ink: #e8eaed;
-      --paper: #0f1115;
-      --paper2: #181b21;
-      --paper3: #20242c;
-      --card-bg: #181b21;
-      --muted: #8b929e;
-      --rule: rgba(255, 255, 255, .08);
-      --rule2: rgba(255, 255, 255, .04);
-      --shadow: 0 4px 20px rgba(0, 0, 0, .4);
-      --shadow-lg: 0 12px 48px rgba(0, 0, 0, .5);
-      --topbar-bg: #0f1115;
-      --viewer-bg: #0b0c10;
-      --viewer-toolbar: #13161c;
-      --coral-lt: rgba(255, 107, 107, .15);
-      --teal-lt: rgba(26, 95, 110, .15);
+      --ink: #f1f2f6;
+      --paper: #0c0d10;
+      --paper2: #15171c;
+      --paper3: #1d2028;
+      --card-bg: #15171c;
+      --muted: #a4b0be;
+      --rule: rgba(255, 255, 255, .06);
+      --rule2: rgba(255, 255, 255, .03);
+      --shadow: 0 4px 24px rgba(0, 0, 0, .4);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, .6);
+      --topbar-bg: #0c0d10;
+      --sidebar-bg: #0c0d10;
+      --coral-lt: rgba(255, 107, 107, .12);
     }
 
     *,
@@ -366,86 +362,81 @@
     }
 
     .global-sidebar {
-      width: 220px;
-      background: var(--topbar-bg);
-      border-right: 2px solid rgba(0, 0, 0, .08);
+      width: 260px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--rule);
       display: flex;
       flex-direction: column;
       z-index: 100;
       flex-shrink: 0;
-      transition: background .4s
+      transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 12px;
     }
 
     .gs-logo {
-      padding: 24px 28px;
-      font-size: 1.55rem;
+      padding: 32px 24px;
+      font-size: 1.8rem;
       font-weight: 800;
-      letter-spacing: -.02em;
+      letter-spacing: -.03em;
       display: flex;
-      align-items: baseline
+      align-items: baseline;
+      font-family: var(--serif);
+      color: var(--teal-dk);
     }
 
-    .gs-logo .tl-sc,
-    .gs-logo .tl-a {
-      color: #fff
-    }
-
-    .gs-logo .tl-ff {
-      color: var(--teal-dk)
-    }
-
-    html.dark .gs-logo .tl-ff {
-      color: #7ac0d0
-    }
-
+    .gs-logo .tl-sc { color: var(--coral) }
+    .gs-logo .tl-ff { color: var(--teal) }
+    
     .gs-logo .tl-spark {
-      font-size: .65rem;
+      font-size: .8rem;
       color: var(--gold);
-      margin-left: 1px;
-      align-self: flex-start;
-      margin-top: 3px
+      margin-left: 2px;
+      animation: sparkle 3s infinite;
     }
 
     .gs-nav {
       flex: 1;
-      padding: 0 12px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-top: 20px
+      gap: 4px;
+      margin-top: 10px
     }
 
     .gs-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      border-radius: 10px;
+      gap: 14px;
+      padding: 14px 20px;
+      border-radius: var(--r-sm);
       font-size: 14px;
       font-weight: 600;
-      color: rgba(255, 255, 255, 0.7);
+      color: var(--muted);
       cursor: pointer;
-      transition: all .2s;
+      transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
       border: none;
       background: transparent;
       width: 100%;
       text-align: left;
-      letter-spacing: 0.02em
     }
 
     .gs-item:hover {
-      background: rgba(255, 255, 255, .08);
-      color: #fff
+      background: var(--paper2);
+      color: var(--ink);
+      transform: translateX(4px);
     }
 
     .gs-item.active {
-      background: rgba(232, 85, 62, .15);
+      background: var(--coral-lt);
       color: var(--coral);
-      font-weight: 800
+      font-weight: 800;
+      box-shadow: inset 0 0 0 1px rgba(255, 107, 107, 0.1);
     }
 
     .gs-icon {
-      font-size: 16px
+      font-size: 18px;
+      width: 24px;
+      display: flex;
+      justify-content: center;
     }
 
     .app-wrapper-right {
@@ -460,14 +451,19 @@
       position: sticky;
       top: 0;
       z-index: 50;
-      background: var(--topbar-bg);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
-      padding: 0 28px;
-      height: 54px;
-      border-bottom: 2px solid rgba(0, 0, 0, .08);
-      box-shadow: 0 2px 12px rgba(232, 85, 62, .15);
-      transition: background .4s
+      padding: 0 32px;
+      height: 64px;
+      border-bottom: 1px solid var(--rule);
+      transition: all .4s
+    }
+
+    html.dark .topbar {
+      background: rgba(12, 13, 16, 0.8);
     }
 
     .tabs-bar {
