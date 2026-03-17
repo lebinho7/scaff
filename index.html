@@ -2436,7 +2436,7 @@
     .curr-status.doing { background:var(--coral) }
     .curr-status.todo { border: 2px solid var(--muted); background: transparent }
     .curr-status.locked { background: transparent; display:flex; align-items:center; justify-content:center; width: 14px; height: 14px; margin-right:8px; border:none }
-    .curr-item.locked { opacity: 0.5; pointer-events: none; filter: grayscale(1) }
+    .curr-item.locked { opacity: 0.6; pointer-events: none; }
     
     .curr-legend { display:flex; gap:24px; margin-bottom:24px; font-size:13px; font-weight:600; align-items:center; padding: 0 16px; flex-wrap:wrap }
     .curr-leg-item { display:flex; align-items:center; gap:8px; color:var(--muted) }
@@ -3147,6 +3147,19 @@
       saveCurriculum(c);
       renderCurriculum();
     }
+    
+    function updateFaltas(semIdx, itemIdx, diff) {
+      event.stopPropagation();
+      const c = getCurriculum();
+      const it = c[semIdx].items[itemIdx];
+      let maxFaltas = parseInt(it.ch) * 0.25;
+      if (!it.faltas) it.faltas = 0;
+      it.faltas += diff;
+      if (it.faltas < 0) it.faltas = 0;
+      if (it.faltas > maxFaltas) it.faltas = maxFaltas;
+      saveCurriculum(c);
+      renderCurriculum();
+    }
 
     function renderCurriculum() {
       const p = document.getElementById('panel-curriculum'); if (!p) return;
@@ -3224,13 +3237,32 @@
             }).join(', ') + `</div>`;
           }
 
+          let faltasHtml = '';
+          if (it.status === 'doing') {
+            const f = it.faltas || 0;
+            const maxF = parseInt(it.ch) * 0.25;
+            const remaining = maxF - f;
+            const daysLeft = Math.floor(remaining / 2);
+            faltasHtml = `<div style="margin-top:12px;display:flex;align-items:center;gap:12px;font-size:11px;color:var(--muted)">
+              <div style="background:var(--card-bg);border:1px solid var(--rule);border-radius:12px;display:flex;align-items:center;overflow:hidden">
+                <button style="border:none;background:var(--rule);padding:4px 10px;cursor:pointer;color:var(--ink);font-weight:bold" onclick="updateFaltas(${idx}, ${iidx}, -1); event.preventDefault();">-</button>
+                <div style="padding:0 6px;font-family:var(--font-mono);font-weight:600;min-width:36px;text-align:center">${f}/${maxF}</div>
+                <button style="border:none;background:var(--rule);padding:4px 10px;cursor:pointer;color:var(--ink);font-weight:bold" onclick="updateFaltas(${idx}, ${iidx}, 1); event.preventDefault();">+</button>
+              </div>
+              <div style="color:${remaining <= maxF*0.2 ? 'var(--coral)' : 'var(--muted)'};font-weight:${remaining <= maxF*0.2 ? 'bold' : 'normal'}">
+                Restam ${daysLeft} dias (${remaining} faltas) permitidos
+              </div>
+            </div>`;
+          }
+
           html += `<div class="curr-item ${locked ? 'locked' : ''}" title="${esc(tooltip)}">
             <div class="curr-status ${stClass}" style="${!locked ? 'cursor:pointer' : ''}" ${!locked ? `onclick="toggleCurrStatus(${idx}, ${iidx})"` : ''} title="Mudar status">${stElement}</div>
             <div class="curr-name" style="flex:1;display:flex;flex-direction:column">
               <span>${esc(it.name)}</span>
               ${reqHtml}
+              ${faltasHtml}
             </div>
-            <div class="curr-meta">${it.ch}</div>
+            <div class="curr-meta" style="align-self:flex-start">${it.ch}</div>
           </div>`;
         });
         html += `</div>`;
