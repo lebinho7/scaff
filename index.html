@@ -3072,30 +3072,38 @@
           const remaining = maxF - f;
           const daysLeft = Math.floor(remaining / 2);
           const pctFaltas = (f / maxF) * 100;
+          const isWarning = remaining <= 4;
+          const isDanger = remaining <= 2;
           
-          html += `<div class="curr-semester fade-up" style="display:flex;flex-direction:column;gap:16px;padding:32px">
+          html += `<div class="curr-semester fade-up" style="display:flex;flex-direction:column;gap:16px;padding:32px;border: 1px solid var(--rule);background:var(--card-bg);box-shadow:var(--shadow);border-radius:var(--r)">
             <div style="display:flex;justify-content:space-between;align-items:flex-start">
               <div>
-                <div style="font-size:18px;font-weight:800;color:var(--ink)">${esc(it.name)}</div>
-                <div style="font-size:12px;color:var(--muted);margin-top:4px">${it.ch} · Carga Horária Total</div>
+                <div style="font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-0.02em">${esc(it.name)}</div>
+                <div style="font-size:12px;color:var(--muted);margin-top:4px;font-weight:500">${it.ch} · Limite: ${maxF} faltas</div>
               </div>
               <div style="text-align:right">
-                <div style="font-size:24px;font-weight:800;color:${f >= maxF*0.75 ? 'var(--coral)' : 'var(--ink)'}">${f}/${maxF}</div>
-                <div style="font-size:11px;color:var(--muted)">faltas totais</div>
+                <div style="font-size:32px;font-weight:900;color:${isWarning ? 'var(--coral)' : 'var(--teal)'};line-height:1">${f}<span style="font-size:16px;color:var(--muted);font-weight:600">/${maxF}</span></div>
+                <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:4px">faltas totais</div>
               </div>
             </div>
 
-            <div style="height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin:8px 0">
-              <div style="height:100%;width:${pctFaltas}%;background:${f >= maxF*0.75 ? 'var(--coral)' : 'var(--teal)'};transition:width 0.3s"></div>
+            <div style="height:12px;background:var(--paper2);border-radius:6px;overflow:hidden;margin:8px 0;border:1px solid var(--rule2)">
+              <div style="height:100%;width:${pctFaltas}%;background:linear-gradient(90deg, ${isWarning ? 'var(--coral), #ff8e8e' : 'var(--teal), #4ecdc4'});transition:width 0.4s cubic-bezier(0.1, 0.7, 1.0, 0.1)"></div>
             </div>
 
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <div style="font-size:13px;color:${remaining <= 4 ? 'var(--coral)' : 'var(--muted)'};font-weight:${remaining <= 4 ? '700' : '400'}">
-                ⚠️ Restam <strong>${remaining}</strong> faltas (${daysLeft} dias)
+            <div style="display:flex;justify-content:space-between;align-items:center;background:var(--paper2);padding:14px 20px;border-radius:var(--r-sm)">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:20px">${isDanger ? '🚨' : (isWarning ? '⚠️' : '✅')}</span>
+                <div style="display:flex;flex-direction:column">
+                   <div style="font-size:13px;color:${isWarning ? 'var(--coral)' : 'var(--ink)'};font-weight:800">
+                      Restam ${remaining} faltas
+                   </div>
+                   <div style="font-size:11px;color:var(--muted);font-weight:500">Equivale a ${daysLeft} dias de aula</div>
+                </div>
               </div>
               <div style="display:flex;gap:8px">
-                <button class="seg-btn" style="padding:8px 16px;min-width:44px" onclick="updateFaltas(${it.sIdx}, ${it.iIdx}, -1)">-</button>
-                <button class="seg-btn" style="padding:8px 16px;min-width:44px" onclick="updateFaltas(${it.sIdx}, ${it.iIdx}, 1)">+</button>
+                <button class="seg-btn" style="padding:10px 18px;border-radius:10px;font-weight:900;background:var(--card-bg);border:1px solid var(--rule)" onclick="updateFaltas(${it.sIdx}, ${it.iIdx}, -1)">-</button>
+                <button class="seg-btn" style="padding:10px 18px;border-radius:10px;font-weight:900;background:${isWarning ? 'var(--coral)' : 'var(--teal)'};color:white;border:none" onclick="updateFaltas(${it.sIdx}, ${it.iIdx}, 1)">+</button>
               </div>
             </div>
           </div>`;
@@ -3222,7 +3230,10 @@
     }
     
     function updateFaltas(semIdx, itemIdx, diff) {
-      event.stopPropagation();
+      if (typeof event !== 'undefined' && event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
       const c = getCurriculum();
       const it = c[semIdx].items[itemIdx];
       let maxFaltas = parseInt(it.ch) * 0.25;
@@ -3231,6 +3242,7 @@
       if (it.faltas < 0) it.faltas = 0;
       if (it.faltas > maxFaltas) it.faltas = maxFaltas;
       saveCurriculum(c);
+      if (STATE.activeGlobal === 'faltas') renderFaltas();
       renderCurriculum();
     }
 
