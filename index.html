@@ -3119,7 +3119,15 @@
       ]}
     ];
 
-    function getCurriculum() { return loadData('curriculum', DEFAULT_CURRICULUM); }
+    function getCurriculum() { 
+      let c = loadData('curriculum', DEFAULT_CURRICULUM); 
+      // Se a grade salva antiga tiver menos semestres que a nova (ex: 7 em vez de 10)
+      if (!c || c.length !== DEFAULT_CURRICULUM.length) {
+        c = DEFAULT_CURRICULUM;
+        saveCurriculum(c);
+      }
+      return c; 
+    }
     function saveCurriculum(data) { saveData('curriculum', data); }
     function toggleCurrStatus(semIdx, itemIdx) {
       const c = getCurriculum();
