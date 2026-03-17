@@ -2435,8 +2435,10 @@
     .curr-status.done { background:var(--teal) }
     .curr-status.doing { background:var(--coral) }
     .curr-status.todo { border: 2px solid var(--muted); background: transparent }
+    .curr-status.locked { background: transparent; display:flex; align-items:center; justify-content:center; width: 14px; height: 14px; margin-right:8px; border:none }
+    .curr-item.locked { opacity: 0.5; pointer-events: none; filter: grayscale(1) }
     
-    .curr-legend { display:flex; gap:24px; margin-bottom:24px; font-size:13px; font-weight:600; align-items:center; padding: 0 16px }
+    .curr-legend { display:flex; gap:24px; margin-bottom:24px; font-size:13px; font-weight:600; align-items:center; padding: 0 16px; flex-wrap:wrap }
     .curr-leg-item { display:flex; align-items:center; gap:8px; color:var(--muted) }
   </style>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -3048,65 +3050,65 @@
         { name: "Introdução à Engenharia", ch: "32h", status: "done" }
       ]},
       { title: "2º Semestre", totalHours: 352, items: [
-        { name: "Cálculo II", ch: "64h", status: "done" },
-        { name: "Física para Engenharia II", ch: "64h", status: "done" },
+        { name: "Cálculo II", ch: "64h", status: "done", req: ["Cálculo I"] },
+        { name: "Física para Engenharia II", ch: "64h", status: "done", req: ["Física para Engenharia I", "Cálculo I"] },
         { name: "Programação Computacional", ch: "64h", status: "done" },
         { name: "Química Aplicada à Engenharia", ch: "64h", status: "done" },
-        { name: "Química Experimental para Engenharia", ch: "32h", status: "done" },
+        { name: "Química Experimental para Engenharia", ch: "32h", status: "done", req: ["Química Aplicada à Engenharia"] },
         { name: "Engenharia Ambiental", ch: "32h", status: "done" },
         { name: "Segurança e Saúde Ocupacional", ch: "32h", status: "done" }
       ]},
       { title: "3º Semestre", totalHours: 384, items: [
-        { name: "Cálculo III", ch: "64h", status: "done" },
-        { name: "Equações Diferenciais Aplicadas", ch: "64h", status: "done" },
-        { name: "Probabilidade e Estatística", ch: "64h", status: "done" },
-        { name: "Princípios de Eletricidade e Magnetismo", ch: "64h", status: "done" },
-        { name: "Ciência dos Materiais", ch: "64h", status: "done" },
-        { name: "Laboratório de Eletricidade", ch: "32h", status: "done" },
-        { name: "Experimentos de Física", ch: "32h", status: "done" }
+        { name: "Cálculo III", ch: "64h", status: "done", req: ["Cálculo II"] },
+        { name: "Equações Diferenciais Aplicadas", ch: "64h", status: "done", req: ["Cálculo II"] },
+        { name: "Probabilidade e Estatística", ch: "64h", status: "done", req: ["Cálculo I"] },
+        { name: "Princípios de Eletricidade e Magnetismo", ch: "64h", status: "done", req: ["Física para Engenharia II", "Cálculo II"] },
+        { name: "Ciência dos Materiais", ch: "64h", status: "done", req: ["Química Aplicada à Engenharia", "Física para Engenharia I"] },
+        { name: "Laboratório de Eletricidade", ch: "32h", status: "done", req: ["Princípios de Eletricidade e Magnetismo"] },
+        { name: "Experimentos de Física", ch: "32h", status: "done", req: ["Física para Engenharia I"] }
       ]},
       { title: "4º Semestre", totalHours: 384, items: [
-        { name: "Métodos Numéricos para Engenharia", ch: "64h", status: "done" },
-        { name: "Termodinâmica Aplicada", ch: "64h", status: "done" },
-        { name: "Mecânica dos Sólidos", ch: "64h", status: "done" },
-        { name: "Dinâmica dos Fluidos I", ch: "64h", status: "done" },
-        { name: "Princípios de Processos Químicos", ch: "64h", status: "done" },
-        { name: "Eletrotécnica Industrial", ch: "32h", status: "done" },
-        { name: "Laboratório de Eletrotécnica", ch: "32h", status: "done" }
+        { name: "Métodos Numéricos para Engenharia", ch: "64h", status: "done", req: ["Programação Computacional", "Álgebra Linear para Engenharia", "Cálculo II"] },
+        { name: "Termodinâmica Aplicada", ch: "64h", status: "done", req: ["Cálculo II", "Física para Engenharia II"] },
+        { name: "Mecânica dos Sólidos", ch: "64h", status: "done", req: ["Física para Engenharia I", "Cálculo II"] },
+        { name: "Dinâmica dos Fluidos I", ch: "64h", status: "done", req: ["Cálculo II", "Física para Engenharia I"] },
+        { name: "Princípios de Processos Químicos", ch: "64h", status: "done", req: ["Química Aplicada à Engenharia"] },
+        { name: "Eletrotécnica Industrial", ch: "32h", status: "done", req: ["Princípios de Eletricidade e Magnetismo"] },
+        { name: "Laboratório de Eletrotécnica", ch: "32h", status: "done", req: ["Eletrotécnica Industrial"] }
       ]},
       { title: "5º Semestre", totalHours: 384, items: [
-        { name: "Transmissão de Calor", ch: "64h", status: "doing" },
-        { name: "Análise de Sistemas Térmicos", ch: "64h", status: "doing" },
-        { name: "Máquinas de Fluxo", ch: "64h", status: "doing" },
-        { name: "Filmes Finos de Semicondutores", ch: "64h", status: "doing" },
-        { name: "Circuitos Elétricos para Renováveis II", ch: "64h", status: "doing" },
-        { name: "Projeto Integrador I", ch: "64h", status: "doing" }
+        { name: "Transmissão de Calor", ch: "64h", status: "doing", req: ["Termodinâmica Aplicada", "Equações Diferenciais Aplicadas"] },
+        { name: "Análise de Sistemas Térmicos", ch: "64h", status: "doing", req: ["Termodinâmica Aplicada"] },
+        { name: "Máquinas de Fluxo", ch: "64h", status: "doing", req: ["Dinâmica dos Fluidos I", "Termodinâmica Aplicada"] },
+        { name: "Filmes Finos de Semicondutores", ch: "64h", status: "doing", req: ["Ciência dos Materiais"] },
+        { name: "Circuitos Elétricos para Renováveis II", ch: "64h", status: "doing", req: ["Princípios de Eletricidade e Magnetismo"] },
+        { name: "Projeto Integrador I", ch: "64h", status: "doing", req: ["Introdução à Engenharia"] }
       ]},
       { title: "6º Semestre", totalHours: 384, items: [
-        { name: "Princípios de Conversão Eletromecânica", ch: "64h", status: "todo" },
-        { name: "Biomassa e Biocombustíveis", ch: "64h", status: "todo" },
-        { name: "Energia Eólica", ch: "64h", status: "todo" },
-        { name: "Energia Solar Térmica", ch: "64h", status: "todo" },
-        { name: "Mecanismos e Dinâmica das Máquinas", ch: "64h", status: "todo" },
-        { name: "Transmissão de Calor Computacional", ch: "64h", status: "todo" }
+        { name: "Princípios de Conversão Eletromecânica", ch: "64h", status: "todo", req: ["Princípios de Eletricidade e Magnetismo"] },
+        { name: "Biomassa e Biocombustíveis", ch: "64h", status: "todo", req: ["Princípios de Processos Químicos"] },
+        { name: "Energia Eólica", ch: "64h", status: "todo", req: ["Mecânica dos Sólidos", "Dinâmica dos Fluidos I"] },
+        { name: "Energia Solar Térmica", ch: "64h", status: "todo", req: ["Transmissão de Calor"] },
+        { name: "Mecanismos e Dinâmica das Máquinas", ch: "64h", status: "todo", req: ["Mecânica dos Sólidos"] },
+        { name: "Transmissão de Calor Computacional", ch: "64h", status: "todo", req: ["Transmissão de Calor", "Dinâmica dos Fluidos I"] }
       ]},
       { title: "7º Semestre", totalHours: 336, items: [
-        { name: "Energia Solar Fotovoltaica", ch: "64h", status: "todo" },
-        { name: "Sistemas de Combustão a Biomassa", ch: "64h", status: "todo" },
-        { name: "Transmissão de Calor Aplic. às Energias Ren.", ch: "48h", status: "todo" },
-        { name: "Células a Combustível e Tecnologias de H2", ch: "64h", status: "todo" },
-        { name: "Laboratório de Energias Renováveis", ch: "64h", status: "todo" },
-        { name: "Manutenção de Equipamentos Industriais", ch: "32h", status: "todo" }
+        { name: "Energia Solar Fotovoltaica", ch: "64h", status: "todo", req: ["Filmes Finos de Semicondutores"] },
+        { name: "Sistemas de Combustão a Biomassa", ch: "64h", status: "todo", req: ["Biomassa e Biocombustíveis", "Termodinâmica Aplicada"] },
+        { name: "Transmissão de Calor Aplic. às Energias Ren.", ch: "48h", status: "todo", req: ["Transmissão de Calor Computacional"] },
+        { name: "Células a Combustível e Tecnologias de H2", ch: "64h", status: "todo", req: ["Termodinâmica Aplicada"] },
+        { name: "Laboratório de Energias Renováveis", ch: "64h", status: "todo", req: ["Energia Eólica", "Energia Solar Térmica"] },
+        { name: "Manutenção de Equipamentos Industriais", ch: "32h", status: "todo", req: ["Mecanismos e Dinâmica das Máquinas"] }
       ]},
       { title: "8º Semestre", totalHours: 320, items: [
-        { name: "Sistemas Mecânicos para Projetos", ch: "64h", status: "todo" },
-        { name: "Propulsão e Geração de Energia", ch: "64h", status: "todo" },
-        { name: "Projeto Integrador II", ch: "64h", status: "todo" },
+        { name: "Sistemas Mecânicos para Projetos", ch: "64h", status: "todo", req: ["Mecânica dos Sólidos"] },
+        { name: "Propulsão e Geração de Energia", ch: "64h", status: "todo", req: ["Máquinas de Fluxo"] },
+        { name: "Projeto Integrador II", ch: "64h", status: "todo", req: ["Projeto Integrador I"] },
         { name: "Optativa I", ch: "64h", status: "todo" },
         { name: "Optativa II", ch: "64h", status: "todo" }
       ]},
       { title: "9º Semestre", totalHours: 320, items: [
-        { name: "Projeto Final de Curso", ch: "64h", status: "todo" },
+        { name: "Projeto Final de Curso", ch: "64h", status: "todo", req: ["Projeto Integrador II", "Metodologia Científica e Tecnológica"] },
         { name: "Optativa III", ch: "64h", status: "todo" },
         { name: "Optativa IV", ch: "64h", status: "todo" },
         { name: "Optativa V", ch: "64h", status: "todo" },
@@ -3142,6 +3144,19 @@
       const courseStr = getProfile().course || 'Engenharia de Energias Renováveis';
       
       const curriculum = getCurriculum();
+      
+      function isLocked(item) {
+        if (!item.req || item.req.length === 0) return false;
+        // Para todas as requisitas, verifica se ela existe em algum lugar do curriculo e está como 'done'
+        return item.req.some(reqName => {
+          for (const s of curriculum) {
+            const found = s.items.find(i => i.name === reqName);
+            if (found) { if (found.status !== 'done') return true; else return false; }
+          }
+          return false;
+        });
+      }
+
       let totalH = 0, doneH = 0;
 
       curriculum.forEach(sem => {
@@ -3175,7 +3190,8 @@
           <div class="curr-leg-item"><div class="curr-status done"></div> Integralizado</div>
           <div class="curr-leg-item"><div class="curr-status doing"></div> Matriculado</div>
           <div class="curr-leg-item"><div class="curr-status todo"></div> Pendente</div>
-          <div style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:normal">💡 Clique nos círculos para alterar o status</div>
+          <div class="curr-leg-item"><div class="curr-status locked">🔒</div> Bloqueada (Pré-Reqs)</div>
+          <div style="margin-left:auto;font-size:11px;color:var(--muted);font-weight:normal;flex-basis:100%;margin-top:8px">💡 Clique nos círculos para alterar o status. Disciplinas bloqueadas dependem das anteriores.</div>
         </div>
         
         <div class="curr-grid">`;
@@ -3184,8 +3200,14 @@
         html += `<div class="curr-semester fade-up delay-${Math.min((idx+2), 5)}">
           <div class="curr-sem-title"><span>${esc(sem.title)}</span><span class="curr-sem-badge">${sem.totalHours}h totais</span></div>`;
         sem.items.forEach((it, iidx) => {
-          html += `<div class="curr-item" title="Carga Horária: ${it.ch}">
-            <div class="curr-status ${it.status}" style="cursor:pointer" onclick="toggleCurrStatus(${idx}, ${iidx})" title="Mudar status"></div>
+          const locked = isLocked(it);
+          const stClass = locked ? 'locked' : it.status;
+          const stElement = locked ? '🔒' : '';
+          
+          let tooltip = locked ? `Bloqueada. Requer: ${it.req.join(', ')}` : `Carga Horária: ${it.ch}`;
+          
+          html += `<div class="curr-item ${locked ? 'locked' : ''}" title="${esc(tooltip)}">
+            <div class="curr-status ${stClass}" style="${!locked ? 'cursor:pointer' : ''}" ${!locked ? `onclick="toggleCurrStatus(${idx}, ${iidx})"` : ''} title="Mudar status">${stElement}</div>
             <div class="curr-name">${esc(it.name)}</div>
             <div class="curr-meta">${it.ch}</div>
           </div>`;
