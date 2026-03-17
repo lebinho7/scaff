@@ -3125,8 +3125,17 @@
       let c = loadData('curriculum', DEFAULT_CURRICULUM); 
       // Se a grade salva antiga tiver menos semestres que a nova (ex: 7 em vez de 10)
       if (!c || c.length !== DEFAULT_CURRICULUM.length) {
-        c = DEFAULT_CURRICULUM;
+        c = JSON.parse(JSON.stringify(DEFAULT_CURRICULUM));
         saveCurriculum(c);
+      } else {
+        // Garante que os saves anteriores sem 'req' recebam o update de dependências
+        c.forEach((sem, sIdx) => {
+          if (!DEFAULT_CURRICULUM[sIdx]) return;
+          sem.items.forEach((it, iIdx) => {
+            const defItem = DEFAULT_CURRICULUM[sIdx].items[iIdx];
+            if (defItem) it.req = defItem.req;
+          });
+        });
       }
       return c; 
     }
