@@ -1,0 +1,20 @@
+
+/* Estilo para o container do logo */
+.gs-logo {
+  display: flex;
+  align-items: center;
+  padding: 20px; /* Ajuste o espaço interno conforme necessário */
+}
+
+/* Estilo para a imagem do logo */
+.logo-img {
+  height: 45px; /* Define a altura do logo na barra lateral */
+  width: auto;  /* Mantém a proporção original */
+  display: block;
+}
+
+/* Garante que o link do logo não tenha bordas ou decorações */
+.gs-logo a {
+  text-decoration: none;
+  display: flex;
+}
