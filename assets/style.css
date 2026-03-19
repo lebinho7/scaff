@@ -1,20 +1,27 @@
 
-/* Estilo para o container do logo */
+/* Container Pai (div.gs-logo) */
 .gs-logo {
-  display: flex;
-  align-items: center;
-  padding: 20px; /* Ajuste o espaço interno conforme necessário */
+  display: flex;         /* Transforma em um container flexível */
+  justify-content: center; /* Centraliza HORIZONTALMENTE */
+  align-items: center;     /* Centraliza VERTICALMENTE */
+  padding: 15px;         /* Reduzimos um pouco o padding para um "respiro" mais confortável */
+  /* padding-top: 15px; padding-bottom: 15px; padding-left: 20px; padding-right: 20px; */
+  /* Use um padding menor se o logo horizontal for muito longo */
 }
 
-/* Estilo para a imagem do logo */
-.logo-img {
-  height: 30px; /* Define a altura do logo na barra lateral */
-  width: auto;  /* Mantém a proporção original */
-  display: block;
-}
-
-/* Garante que o link do logo não tenha bordas ou decorações */
+/* Container Filho Intermediário (a) - CASO EXISTA */
 .gs-logo a {
-  text-decoration: none;
-  display: flex;
+  display: flex;         /* Transforma o link em um container flexível para centralizar a imagem dentro */
+  justify-content: center; /* Garante alinhamento horizontal se o link se esticar */
+  align-items: center;     /* Garante alinhamento vertical se o link se esticar */
+  text-decoration: none;   /* Remova qualquer decoração de link */
+}
+
+/* Imagem do Logo (img.logo-img) */
+.logo-img {
+  height: 35px;          /* Define a altura do logo na barra lateral (diminuído de 45px) */
+  width: auto;           /* Mantém a proporção original */
+  max-width: 100%;       /* Garante que o logo nunca estoure a largura do container */
+  object-fit: contain;  /* Mantém a proporção da imagem sem cortá-la */
+  display: block;        /* Ajuda a evitar espaços extras indesejados abaixo da imagem */
 }
