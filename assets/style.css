@@ -3,12 +3,12 @@
 .gs-logo {
   display: flex;
   align-items: center;
-  padding: 20px; /* Ajuste o espaço interno conforme necessário */
+  padding: 10px 15px; /* Ajuste o espaço interno conforme necessário */
 }
 
 /* Estilo para a imagem do logo */
 .logo-img {
-  height: 15px; /* Define a altura do logo na barra lateral */
+  height: 30px; /* Define a altura do logo na barra lateral */
   width: auto;  /* Mantém a proporção original */
   display: block;
 }
