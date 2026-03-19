@@ -3,7 +3,7 @@
 .gs-logo {
   display: flex;
   align-items: center;
-  padding: 10px 15px; /* Ajuste o espaço interno conforme necessário */
+  padding: 15px; /* Ajuste o espaço interno conforme necessário */
 }
 
 /* Estilo para a imagem do logo */
