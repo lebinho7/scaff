@@ -25,3 +25,21 @@
   object-fit: contain;  /* Mantém a proporção da imagem sem cortá-la */
   display: block;        /* Ajuda a evitar espaços extras indesejados abaixo da imagem */
 }
+
+/* --- SEÇÃO: CARD CENTRAL (login) --- */
+.gs-logo-section {
+  display: flex;
+  flex-direction: column; /* Coloca logo em cima e texto embaixo */
+  align-items: center;    /* Centraliza tudo na horizontal */
+  justify-content: center; /* Centraliza tudo na vertical */
+  padding: 60px;          /* Padding generoso para o card */
+  background-color: #fff;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.logo-card {
+  height: 80px; /* Maior para dar destaque no centro */
+  width: auto;
+  margin-bottom: 20px; /* Espaço entre o logo e o texto abaixo */
+}
