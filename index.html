@@ -45,8 +45,6 @@
       --serif: 'Cormorant Garamond', serif;
       --topbar-bg: #fdfaf5;
       --sidebar-bg: #fdfaf5;
-      --sidebar-width: 260px;
-      --sidebar-collapsed-width: 64px;
     }
 
     html.dark {
@@ -365,18 +363,15 @@
     }
 
     .global-sidebar {
-      width: var(--sidebar-width);
+      width: 260px;
       background: var(--sidebar-bg);
       border-right: 1px solid var(--rule);
       display: flex;
       flex-direction: column;
       z-index: 100;
       flex-shrink: 0;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-                  padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
       padding: 12px;
-      position: relative;
-      overflow: visible;
     }
 
     .gs-logo {
@@ -388,22 +383,6 @@
       align-items: baseline;
       font-family: var(--serif);
       color: var(--teal-dk);
-    }
-
-    .global-sidebar.collapsed .gs-logo {
-      font-size: 1rem;
-      padding: 24px 0;
-      justify-content: center;
-      letter-spacing: 0;
-    }
-
-    .global-sidebar.collapsed .gs-logo .tl-a,
-    .global-sidebar.collapsed .gs-logo .tl-ff {
-      display: none;
-    }
-
-    .global-sidebar.collapsed .gs-logo .tl-spark {
-      display: none;
     }
 
     .gs-logo .tl-sc { color: var(--coral) }
@@ -459,120 +438,6 @@
       width: 24px;
       display: flex;
       justify-content: center;
-      flex-shrink: 0;
-    }
-
-    /* Sidebar label (text next to icon) */
-    .gs-label {
-      white-space: nowrap;
-      overflow: hidden;
-      opacity: 1;
-      transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-                  width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-                  margin 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* Collapsed sidebar */
-    .global-sidebar.collapsed {
-      width: var(--sidebar-collapsed-width);
-      padding: 12px 6px;
-    }
-
-    .global-sidebar.collapsed .gs-logo {
-      justify-content: center;
-      padding: 15px 4px;
-      overflow: hidden;
-    }
-
-    .global-sidebar.collapsed .gs-label {
-      opacity: 0;
-      width: 0;
-      overflow: hidden;
-      pointer-events: none;
-      margin: 0;
-    }
-
-    .global-sidebar.collapsed .gs-item {
-      justify-content: center;
-      padding: 14px 0;
-      gap: 0;
-      position: relative;
-    }
-
-    .global-sidebar.collapsed .gs-item:hover {
-      transform: none;
-    }
-
-    /* Tooltip on collapsed items */
-    .global-sidebar.collapsed .gs-item::after {
-      content: attr(aria-label);
-      position: absolute;
-      left: calc(100% + 12px);
-      top: 50%;
-      transform: translateY(-50%) scale(0.92);
-      background: var(--teal-dk);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 8px;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s, transform 0.15s;
-      z-index: 1000;
-      box-shadow: 0 4px 12px rgba(0,0,0,.15);
-    }
-
-    html.dark .global-sidebar.collapsed .gs-item::after {
-      background: var(--paper3);
-      color: var(--ink);
-    }
-
-    .global-sidebar.collapsed .gs-item:hover::after {
-      opacity: 1;
-      transform: translateY(-50%) scale(1);
-    }
-
-    /* Sidebar toggle button */
-    .sidebar-toggle {
-      position: absolute;
-      top: 50%;
-      right: -14px;
-      transform: translateY(-50%);
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--card-bg);
-      border: 1px solid var(--rule);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--muted);
-      box-shadow: 0 2px 8px rgba(0,0,0,.08);
-      z-index: 101;
-      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
-      padding: 0;
-      line-height: 1;
-    }
-
-    .sidebar-toggle:hover {
-      background: var(--coral-lt);
-      color: var(--coral);
-      border-color: var(--coral);
-      box-shadow: 0 2px 12px rgba(232, 85, 62, .2);
-    }
-
-    .sidebar-toggle .toggle-icon {
-      display: inline-block;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .global-sidebar.collapsed .sidebar-toggle .toggle-icon {
-      transform: rotate(180deg);
     }
 
     .app-wrapper-right {
@@ -2490,19 +2355,6 @@
       .topbar-user {
         display: none
       }
-
-      .sidebar-toggle {
-        display: none
-      }
-
-      .global-sidebar {
-        width: 100% !important;
-      }
-
-      .global-sidebar .gs-label {
-        opacity: 1 !important;
-        width: auto !important;
-      }
     }
 
     .login-toggle {
@@ -2654,32 +2506,26 @@
   <!-- APP -->
   <div id="screen-app" class="screen">
     <nav class="global-sidebar">
-      <div class="gs-logo">
-        <a href="#">
-          <img src="assets/scaff wordmark.png" alt="Scaff Logo" id="sidebar-logo">
-        </a>
-      </div>
+      <div class="gs-logo"><a href="#"><img src="assets/scaff wordmark.png" alt="Scaff Logo"
+          class="logo-img"></a></div>
       <div class="gs-nav">
         <button class="gs-item active" id="gs-nav-home" onclick="showDashboard()" aria-label="Início"><span
-            class="gs-icon">🏠</span><span class="gs-label">Início</span></button>
+            class="gs-icon">🏠</span> Início</button>
         <button class="gs-item" id="gs-nav-schedule" onclick="showSchedule()" aria-label="Cronograma"><span
-            class="gs-icon">📅</span><span class="gs-label">Cronograma</span></button>
+            class="gs-icon">📅</span> Cronograma</button>
         <button class="gs-item" id="gs-nav-curriculum" onclick="showCurriculum()" aria-label="Percurso Curricular"><span
-            class="gs-icon">🎓</span><span class="gs-label">Curriculo</span></button>
+            class="gs-icon">🎓</span> Curriculo</button>
         <button class="gs-item" id="gs-nav-faltas" onclick="showFaltas()" aria-label="Contador de Faltas"><span
-            class="gs-icon">⚠️</span><span class="gs-label">Faltas</span></button>
+            class="gs-icon">⚠️</span> Faltas</button>
         <button class="gs-item" id="gs-nav-community" onclick="showCommunity()" aria-label="Comunidade"><span
-            class="gs-icon">💬</span><span class="gs-label">Comunidade</span></button>
+            class="gs-icon">💬</span> Comunidade</button>
         <button class="gs-item" id="gs-nav-explore" onclick="showExplore()" aria-label="Explorar Mapa"><span
-            class="gs-icon">🗺️</span><span class="gs-label">Explorar</span></button>
+            class="gs-icon">🗺️</span> Explorar</button>
       </div>
       <div class="gs-nav" style="flex:0;margin-top:auto;padding-bottom:24px">
         <button class="gs-item" id="gs-nav-about" onclick="showAbout()" aria-label="Sobre o app"><span
-            class="gs-icon">ℹ️</span><span class="gs-label">Sobre</span></button>
+            class="gs-icon">ℹ️</span> Sobre</button>
       </div>
-      <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Recolher menu" title="Recolher menu">
-        <span class="toggle-icon">‹</span>
-      </button>
     </nav>
 
     <div class="app-wrapper-right">
@@ -3034,37 +2880,8 @@
       }, 400);
     }
 
-    /* ═══ SIDEBAR TOGGLE ═══ */
-    function toggleSidebar() {
-      const sidebar = document.querySelector('.global-sidebar');
-      sidebar.classList.toggle('collapsed');
-      const collapsed = sidebar.classList.contains('collapsed');
-      localStorage.setItem('scaff_sidebar_collapsed', collapsed ? 'true' : 'false');
-      document.getElementById('sidebar-logo').src = collapsed ? 'assets/scaff abelha.png' : 'assets/scaff wordmark.png';
-      const btn = document.querySelector('.sidebar-toggle');
-      if (btn) {
-        btn.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu');
-        btn.setAttribute('title', collapsed ? 'Expandir menu' : 'Recolher menu');
-      }
-    }
-
-    function restoreSidebarState() {
-      if (localStorage.getItem('scaff_sidebar_collapsed') === 'true') {
-        const sidebar = document.querySelector('.global-sidebar');
-        if (sidebar) {
-          sidebar.classList.add('collapsed');
-          document.getElementById('sidebar-logo').src = 'assets/scaff abelha.png';
-          const btn = document.querySelector('.sidebar-toggle');
-          if (btn) {
-            btn.setAttribute('aria-label', 'Expandir menu');
-            btn.setAttribute('title', 'Expandir menu');
-          }
-        }
-      }
-    }
-
     /* ═══ INIT ═══ */
-    function initApp() { renderTabs(); renderAppBody(); showDashboard(); restoreSidebarState(); }
+    function initApp() { renderTabs(); renderAppBody(); showDashboard() }
     function setDiscView(did, view) {
       STATE.discView[did] = view;
       const panel = document.getElementById('panel-' + did); if (!panel) return;
