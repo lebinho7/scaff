@@ -2586,6 +2586,45 @@
     
     .curr-legend { display:flex; gap:24px; margin-bottom:24px; font-size:13px; font-weight:600; align-items:center; padding: 0 16px; flex-wrap:wrap }
     .curr-leg-item { display:flex; align-items:center; gap:8px; color:var(--muted) }
+
+    /* SIMULADOR DE MATRÍCULA */
+    .sim-container { display:flex; flex-direction:column; height:100%; padding:24px; background:var(--paper); gap:20px; overflow-y:auto; overflow-x:hidden; }
+    .sim-header { display:flex; flex-direction:column; gap:8px; margin-bottom: 20px;}
+    .sim-title { font-size:32px; font-weight:800; font-family:var(--serif); color:var(--ink) }
+    .sim-sub { font-size:14px; color:var(--muted) }
+    
+    .sim-grid-wrap { display:grid; grid-template-columns: 60px repeat(5, 1fr); gap:6px; background:var(--card-bg); padding:16px; border-radius:var(--r); border:1px solid var(--rule); box-shadow:var(--shadow);}
+    .sim-day-head, .sim-time-head { font-size:11px; font-weight:800; letter-spacing:.05em; color:var(--muted); text-align:center; padding:8px 4px; display:flex; align-items:center; justify-content:center;}
+    .sim-day-head { border-bottom: 2px solid var(--rule2); margin-bottom: 4px; }
+    
+    .sim-slot { 
+      background:var(--paper2); border-radius:12px; min-height:80px; padding:6px; 
+      border:2px dashed transparent; transition:all .2s ease; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    }
+    .sim-slot.blocked { background:var(--rule); opacity:0.6; cursor:not-allowed; background-image:repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.05) 10px, rgba(0,0,0,0.05) 20px); }
+    .sim-slot.valid-target { border-color:var(--teal); background:var(--teal-lt); }
+    .sim-slot.conflict { border-color:var(--coral); background:rgba(232, 85, 62, 0.15); }
+    .sim-slot.hover-active { border:2px dashed var(--teal); transform:scale(1.02); }
+
+    .sim-drawer { background:var(--card-bg); border-radius:var(--r); border:1px solid var(--rule); padding:20px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:16px; margin-bottom: 40px; margin-top: auto;}
+    .sim-drawer-title { font-size:14px; font-weight:800; color:var(--ink); }
+    .sim-drawer-list { display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; scrollbar-width:thin;}
+    
+    .sim-card {
+      background:#d8e5f2; color:#1a4a6a; border: 1.5px solid rgba(26, 74, 106, 0.3); padding:8px; border-radius:8px; 
+      font-size:9.5px; font-weight:700; text-align:center; min-width:120px; max-width:140px; cursor:grab;
+      display:flex; flex-direction:column; justify-content:center; gap:4px; transition:transform .1s, box-shadow .1s; box-shadow:0 4px 12px rgba(0,0,0,0.08);
+      user-select:none; z-index:10;
+    }
+    .sim-card.dragging { opacity:0.6; }
+    .sim-card:hover { transform:translateY(-2px); box-shadow:0 8px 16px rgba(0,0,0,0.15); }
+    .sim-card-icon { font-size: 16px; margin-bottom: 2px; }
+    .sim-card.in-grid { min-width:unset; max-width:unset; width:100%; height:100%; margin:0; cursor:pointer; }
+    
+    .sim-footer { display:flex; align-items:center; justify-content:space-between; margin-top:8px;}
+    .sim-ch-status { font-size:12px; font-weight:600; color:var(--muted); }
+    .sim-btn-save { background:var(--paper2); border:1px solid var(--rule); color:var(--ink); padding:8px 24px; border-radius:20px; font-size:12px; font-weight:800; cursor:pointer; transition:all .15s;}
+    .sim-btn-save:hover { background:var(--teal); color:#fff; border-color:var(--teal);}
   </style>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -2668,6 +2707,8 @@
             class="gs-icon">🎓</span><span class="gs-label">Curriculo</span></button>
         <button class="gs-item" id="gs-nav-faltas" onclick="showFaltas()" aria-label="Contador de Faltas"><span
             class="gs-icon">⚠️</span><span class="gs-label">Faltas</span></button>
+        <button class="gs-item" id="gs-nav-simulator" onclick="showSimulator()" aria-label="Simulador de Matrícula"><span
+            class="gs-icon">🧩</span><span class="gs-label">Simulador</span></button>
         <button class="gs-item" id="gs-nav-community" onclick="showCommunity()" aria-label="Comunidade"><span
             class="gs-icon">💬</span><span class="gs-label">Comunidade</span></button>
         <button class="gs-item" id="gs-nav-explore" onclick="showExplore()" aria-label="Explorar Mapa"><span
@@ -3123,6 +3164,7 @@
       else if (STATE.activeGlobal === 'community') { const el = document.getElementById('gs-nav-community'); if (el) el.classList.add('active') }
       else if (STATE.activeGlobal === 'about') { const el = document.getElementById('gs-nav-about'); if (el) el.classList.add('active') }
       else if (STATE.activeGlobal === 'explore') { const el = document.getElementById('gs-nav-explore'); if (el) el.classList.add('active') }
+      else if (STATE.activeGlobal === 'simulator') { const el = document.getElementById('gs-nav-simulator'); if (el) el.classList.add('active') }
       else if (STATE.activeGlobal === 'faltas') { const el = document.getElementById('gs-nav-faltas'); if (el) el.classList.add('active') }
       else if (!STATE.activeDisc) { const el = document.getElementById('gs-nav-home'); if (el) el.classList.add('active') }
     }
@@ -3137,6 +3179,7 @@
     <div id="stats-area"></div></div>`
         + `<div class="global-panel" id="panel-schedule"></div>`
         + `<div class="global-panel" id="panel-curriculum"></div>`
+        + `<div class="global-panel" id="panel-simulator" style="padding:0"></div>`
         + `<div class="global-panel" id="panel-community"></div>`
         + `<div class="global-panel" id="panel-explore"></div>`
         + `<div class="global-panel" id="panel-faltas"></div>`
@@ -3218,6 +3261,12 @@
     function showCommunity() { STATE.activeDisc = null; STATE.activeGlobal = 'community'; hideAllPanels(); document.getElementById('panel-community').classList.add('active'); if (STATE.currentUser && !STATE.currentUser.email?.endsWith('@demo')) { listenCommunity(); } else { globalPosts = MOCK_POSTS; } renderCommunity(); renderTabs(); updateGlobalSidebar() }
     function showAbout() { STATE.activeDisc = null; STATE.activeGlobal = 'about'; hideAllPanels(); document.getElementById('panel-about').classList.add('active'); renderAbout(); renderTabs(); updateGlobalSidebar() }
     
+    function showSimulator() {
+      STATE.activeDisc = null; STATE.activeGlobal = 'simulator'; hideAllPanels();
+      const panel = document.getElementById('panel-simulator'); if (panel) panel.classList.add('active');
+      renderSimulator(); renderTabs(); updateGlobalSidebar();
+    }
+
     function showFaltas() {
       STATE.activeDisc = null; STATE.activeGlobal = 'faltas'; hideAllPanels();
       const panel = document.getElementById('panel-faltas'); if (panel) panel.classList.add('active');
@@ -3992,6 +4041,183 @@
       html += '</body></html>';
       const w = window.open('', '_blank'); w.document.write(html); w.document.close();
     }
+
+    /* ═══ SIMULATOR ═══ */
+    const SIMULATOR_CLASSES = [
+      { id: 'c1', name: 'PRINCÍPIOS DE CONVERSÃO ELETROMECÂNICA', prof: 'PROFESSOR SILVA', ch: 64, credits: 4, schedule: ['SEG_14', 'QUA_14'], color: '#c4f4f7', border: '#6adcd3', icon: '⚡' },
+      { id: 'c2', name: 'ANÁLISE DE SISTEMAS TÉRMICOS', prof: 'MÔNICA', ch: 64, credits: 4, schedule: ['TER_08', 'QUI_08'], color: '#f7d5df', border: '#ea9bad', icon: '🔥' },
+      { id: 'c3', name: 'TRANSMISSÃO DE CALOR', prof: 'WILLIAM', ch: 64, credits: 4, schedule: ['QUA_08', 'SEG_10'], color: '#dcedf6', border: '#9fc0dd', icon: '🌡️' },
+      { id: 'c4', name: 'MÁQUINAS DE FLUXO', prof: 'CARLA', ch: 64, credits: 4, schedule: ['TER_10', 'QUI_10'], color: '#d2f2ea', border: '#7ed4c5', icon: '🔄' },
+      { id: 'c5', name: 'RESISTÊNCIA DOS MATERIAIS', prof: 'ILSON (LAB)', ch: 64, credits: 4, schedule: ['TER_14', 'QUI_14'], color: '#e8e2f3', border: '#b9aadd', icon: '🏗️' },
+      { id: 'c6', name: 'FILMES FINOS DE SEMICONDUTORES', prof: 'ANA FABÍOLA', ch: 64, credits: 4, schedule: ['SEG_08', 'SEX_08'], color: '#e3e7eb', border: '#b2bed0', icon: '🔬' },
+      { id: 'c7', name: 'EXPERIMENTOS DE FÍSICA', prof: 'MARCOS', ch: 32, credits: 2, schedule: ['SEX_10'], color: '#f3f6e5', border: '#c7d687', icon: '📐' }
+    ];
+    let simEnrolled = [];
+    let simDraggedId = null;
+
+    function renderSimulator() {
+      const panel = document.getElementById('panel-simulator'); if (!panel) return;
+      const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX'];
+      const times = ['08h-10h', '10h-12h', '12h-14h', '14h-16h', '16h-18h'];
+      const timeIds = ['08', '10', '12', '14', '16'];
+      
+      let totalCredits = simEnrolled.reduce((acc, cur) => acc + (SIMULATOR_CLASSES.find(c=>c.id===cur)?.credits || 0), 0);
+      let isValidStatus = totalCredits >= 12 && totalCredits <= 28;
+      
+      let html = `<div class="sim-container fade-up">
+        <div class="sim-header">
+          <div class="sim-title">Simulador de Matrícula</div>
+          <div class="sim-sub">Arraste as disciplinas disponíveis para os horários destacados na grade.</div>
+        </div>
+        
+        <div class="sim-grid-wrap">
+          <div></div> <!-- Vazio para top-left -->
+          ${days.map(d => `<div class="sim-day-head">${d}</div>`).join('')}
+          `;
+          
+      times.forEach((t, tIdx) => {
+        html += `<div class="sim-time-head">${t.replace('h','').replace('h','')}h</div>`;
+        days.forEach((day, dIdx) => {
+          const slotId = `${day}_${timeIds[tIdx]}`;
+          if (timeIds[tIdx] === '12') {
+             html += `<div class="sim-slot blocked" title="Horário de Almoço"><div style="opacity:0.3;font-size:24px">🚫</div></div>`;
+          } else {
+             const occClsId = simEnrolled.find(id => SIMULATOR_CLASSES.find(c=>c.id===id).schedule.includes(slotId));
+             if (occClsId) {
+               const cls = SIMULATOR_CLASSES.find(c=>c.id===occClsId);
+               html += `<div class="sim-slot" id="slot-${slotId}" style="padding:4px">
+                 <div class="sim-card in-grid" style="background:${cls.color};border-color:${cls.border};color:#222;" onclick="simRemoveClass('${cls.id}')" title="Clique para remover">
+                   <div class="sim-card-icon">${cls.icon}</div>
+                   <div style="font-size:9.5px;line-height:1.2">${esc(cls.name)}</div>
+                   <div style="opacity:0.6;font-size:8px;margin-top:2px">(${esc(cls.prof)})</div>
+                 </div>
+               </div>`;
+             } else {
+               html += `<div class="sim-slot" id="slot-${slotId}" data-slot="${slotId}" 
+                 ondragover="simDragOver(event)" ondragleave="simDragLeave(event)" ondrop="simDrop(event, '${slotId}')"></div>`;
+             }
+          }
+        });
+      });
+      
+      const availableClasses = SIMULATOR_CLASSES.filter(c => !simEnrolled.includes(c.id));
+
+      html += `</div>
+        
+        <div class="sim-drawer fade-up delay-2" ondragover="simDragOverDrawer(event)" ondrop="simDropDrawer(event)">
+          <div class="sim-drawer-title">Disciplinas Disponíveis</div>
+          <div class="sim-drawer-list">
+            ${availableClasses.map(c => `
+              <div class="sim-card" id="sim-c-${c.id}" draggable="true" ondragstart="simDragStart(event, '${c.id}')" ondragend="simDragEnd(event)"
+                style="background:${c.color};color:#222;border-color:${c.border}">
+                <div class="sim-card-icon">${c.icon}</div>
+                <div style="line-height:1.3">${esc(c.name)}</div>
+                <div style="font-size:8.5px;margin-top:4px;opacity:0.6">(${esc(c.prof)})</div>
+              </div>
+            `).join('')}
+            ${availableClasses.length === 0 ? '<div style="font-size:12px;color:var(--muted);padding:20px;text-align:center;width:100%">Todas as disciplinas alocadas!</div>' : ''}
+          </div>
+          
+          <div class="sim-footer">
+            <div class="sim-ch-status" style="font-family:var(--sans)">Carga Horária: <strong style="color:${isValidStatus || totalCredits===0 ? 'var(--teal)' : 'var(--coral)'};font-size:14px">${totalCredits}h</strong> / Mínima: 12h / Máxima: 28h</div>
+            <button class="sim-btn-save" onclick="simSave()">Salvar Simulação</button>
+          </div>
+        </div>
+      </div>`;
+      
+      panel.innerHTML = html;
+    }
+
+    function simDragStart(e, cid) {
+      simDraggedId = cid;
+      e.dataTransfer.setData('text/plain', cid);
+      setTimeout(() => e.target.classList.add('dragging'), 10);
+      
+      const cls = SIMULATOR_CLASSES.find(c => c.id === cid);
+      cls.schedule.forEach(slot => {
+        const el = document.getElementById('slot-' + slot);
+        if (el) {
+          const isFull = simEnrolled.some(id => SIMULATOR_CLASSES.find(c=>c.id===id).schedule.includes(slot));
+          if (isFull) el.classList.add('conflict');
+          else el.classList.add('valid-target');
+        }
+      });
+    }
+
+    function simDragEnd(e) {
+      e.target.classList.remove('dragging');
+      simDraggedId = null;
+      document.querySelectorAll('.sim-slot').forEach(el => {
+        el.classList.remove('valid-target', 'conflict', 'hover-active');
+      });
+    }
+
+    function simDragOver(e) {
+      e.preventDefault();
+      const target = e.currentTarget;
+      if (target.classList.contains('valid-target')) target.classList.add('hover-active');
+    }
+
+    function simDragLeave(e) {
+      e.currentTarget.classList.remove('hover-active');
+    }
+
+    function simDrop(e, slotId) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('hover-active');
+      if (!simDraggedId) return;
+      
+      const cls = SIMULATOR_CLASSES.find(c => c.id === simDraggedId);
+      if (!cls.schedule.includes(slotId)) return;
+      
+      let hasConflict = false;
+      cls.schedule.forEach(s => {
+        if(simEnrolled.some(id => SIMULATOR_CLASSES.find(c=>c.id===id).schedule.includes(s))) hasConflict = true;
+      });
+      
+      if (hasConflict) {
+        alert("Choque de horário detectado! Remova a disciplina conflitante primeiro.");
+        return;
+      }
+      
+      simEnrolled.push(simDraggedId);
+      renderSimulator();
+    }
+    
+    function simRemoveClass(cid) {
+      simEnrolled = simEnrolled.filter(id => id !== cid);
+      renderSimulator();
+    }
+
+    function simDragOverDrawer(e) { e.preventDefault(); }
+    function simDropDrawer(e) { }
+
+    function simSave() {
+      if (simEnrolled.length === 0) { alert('Sua grade está vazia!'); return; }
+      saveData('simulator_state', simEnrolled);
+      if (confirm('Simulação salva com sucesso! Deseja compartilhar sua grade de horários gerada na aba Comunidade?')) {
+        const user = document.getElementById('topbar-username').textContent || 'Aluno';
+        const msg = `Acabei de montar minha grade pelo Simulador! O que acham?\n` +
+          simEnrolled.map(id => {
+            const c = SIMULATOR_CLASSES.find(x=>x.id===id);
+            return `• ${c.name} (${c.schedule.join(', ')})`;
+          }).join('\n');
+          
+        db.collection('global_forum').add({
+          name: user,
+          channel: 'geral',
+          text: msg,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          likes: 0
+        }).then(() => {
+          alert('Grade publicada na comunidade!');
+          showCommunity();
+        }).catch(() => {
+          alert('Erro ao publicar. Você precisa estar logado com conta oficial (sem modo Demo).');
+        });
+      }
+    }
+
 
     /* ═══ PASSWORD TOGGLE ═══ */
     function togglePassVis() {
