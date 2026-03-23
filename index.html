@@ -21,24 +21,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --coral: #ff6b6b;
-      --coral-dk: #ee5253;
-      --coral-lt: rgba(255, 107, 107, .08);
-      --teal: #2d3436;
-      --teal-dk: #1e272e;
-      --teal-lt: rgba(45, 52, 54, .05);
-      --gold: #feca57;
-      --gold-lt: rgba(254, 202, 87, .15);
-      --ink: #2d3436;
+      --coral: #e8553e;
+      --coral-dk: #c8402b;
+      --coral-lt: rgba(232, 85, 62, .08);
+      --teal: #1a5f6e;
+      --teal-dk: #11424d;
+      --teal-lt: rgba(26, 95, 110, .05);
+      --gold: #e8c547;
+      --gold-lt: rgba(232, 197, 71, .15);
+      --ink: #111a1c;
       --paper: #fdfaf5;
-      --paper2: #f1ede4;
+      --paper2: #f3efe9;
       --paper3: #e8e2d5;
       --card-bg: #ffffff;
-      --muted: #576574;
-      --rule: rgba(0, 0, 0, .08);
-      --rule2: rgba(0, 0, 0, .04);
-      --shadow: 0 4px 24px rgba(0, 0, 0, .04);
-      --shadow-lg: 0 16px 48px rgba(0, 0, 0, .08);
+      --muted: #4f5a66;
+      --rule: rgba(0, 0, 0, .12);
+      --rule2: rgba(0, 0, 0, .06);
+      --shadow: 0 4px 24px rgba(0, 0, 0, .06);
+      --shadow-lg: 0 16px 48px rgba(0, 0, 0, .10);
       --r: 20px;
       --r-sm: 12px;
       --sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -55,14 +55,14 @@
       --paper2: #15171c;
       --paper3: #1d2028;
       --card-bg: #15171c;
-      --muted: #a4b0be;
-      --rule: rgba(255, 255, 255, .08);
-      --rule2: rgba(255, 255, 255, .04);
+      --muted: #8b99a8;
+      --rule: rgba(255, 255, 255, .1);
+      --rule2: rgba(255, 255, 255, .05);
       --shadow: 0 4px 24px rgba(0, 0, 0, .4);
       --shadow-lg: 0 16px 48px rgba(0, 0, 0, .6);
       --topbar-bg: #0c0d10;
       --sidebar-bg: #0c0d10;
-      --coral-lt: rgba(255, 107, 107, .15);
+      --coral-lt: rgba(232, 85, 62, .15);
     }
 
     *,
@@ -2376,10 +2376,10 @@
       flex-direction: column;
       gap: 10px;
       background: transparent;
-      border: 2px dashed rgba(232, 85, 62, .3);
+      border: 2px dashed rgba(232, 85, 62, .5);
       border-radius: 12px;
       cursor: pointer;
-      color: rgba(232, 85, 62, .5);
+      color: rgba(232, 85, 62, .9);
       transition: border-color .18s, color .18s, background .18s;
       min-height: 130px
     }
@@ -2623,7 +2623,7 @@
           style="text-align:center;margin:12px 0 4px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">
           Ou</div>
         <button class="login-btn" onclick="doDemoLogin()"
-          style="background:transparent;border:1.5px solid var(--rule);color:var(--ink);box-shadow:none">Explorar como
+          style="background:transparent;border:2px solid var(--muted);color:var(--ink);box-shadow:none;font-weight:700">Explorar como
           Visitante (Demo)</button>
         <div class="login-error" id="login-error" role="alert"></div>
         <div class="login-toggle" onclick="showRegister()">Não tem conta? <span>Criar conta</span></div>
