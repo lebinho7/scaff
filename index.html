@@ -2793,9 +2793,58 @@
         <div class="color-swatch" data-color="#5a3a2a" style="background:#5a3a2a" role="radio" aria-checked="false"
           tabindex="0"></div>
       </div>
+      </div>
       <div class="modal-actions">
         <button class="modal-btn-cancel" onclick="closeAddModal()">Cancelar</button>
         <button class="modal-btn-add" onclick="addDiscipline()">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIMULATOR ADD MODAL -->
+  <div id="modal-sim-add" role="dialog" aria-modal="true" aria-labelledby="modal-sim-add-title">
+    <div class="modal-card" style="max-height:90vh;overflow-y:auto;width:480px;max-width:90vw;">
+      <div class="modal-title" id="modal-sim-add-title">Nova Disciplina Personalizada</div>
+      <div class="modal-subtitle" style="margin-bottom:16px">Configure uma cadeira e seus horários para simular.</div>
+      
+      <label class="modal-label" for="sim-new-name">Nome da Disciplina</label>
+      <input class="modal-input" id="sim-new-name" placeholder="Ex: Algoritmos e Grafos">
+      
+      <div class="modal-row">
+        <div style="flex:1"><label class="modal-label" for="sim-new-prof">Professor / Local</label><input class="modal-input"
+            id="sim-new-prof" placeholder="Ex: Camila (Sala 3)"></div>
+        <div style="flex:1"><label class="modal-label" for="sim-new-credits">Créditos</label><input class="modal-input"
+            id="sim-new-credits" type="number" min="2" max="10" value="4"></div>
+      </div>
+      
+      <div class="modal-row">
+        <div style="flex:1">
+          <label class="modal-label">Ícone</label>
+          <select class="modal-input" id="sim-new-icon" style="background:var(--card-bg)">
+            <option value="📘">📘 Livro</option>
+            <option value="⚡">⚡ Física/Elétrica</option>
+            <option value="💻">💻 Computação</option>
+            <option value="📐">📐 Matemática</option>
+            <option value="🔬">🔬 Ciências</option>
+            <option value="🏗️">🏗️ Construção</option>
+            <option value="🎨">🎨 Artes</option>
+            <option value="⭐">⭐ Genérico</option>
+          </select>
+        </div>
+        <div style="flex:1">
+          <label class="modal-label">Cor</label>
+          <input type="color" class="modal-input" id="sim-new-color" value="#c4f4f7" style="height:48px;padding:4px;cursor:pointer;">
+        </div>
+      </div>
+
+      <label class="modal-label" style="margin-top:10px">Horários (Selecione os blocos)</label>
+      <div id="sim-sch-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:24px;text-align:center">
+         <!-- renderizado via js -->
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-btn-cancel" onclick="closeSimAddModal()">Cancelar</button>
+        <button class="modal-btn-add" onclick="saveSimCustomClass()">Criar Disciplina</button>
       </div>
     </div>
   </div>
@@ -4043,17 +4092,19 @@
     }
 
     /* ═══ SIMULATOR ═══ */
-    const SIMULATOR_CLASSES = [
-      { id: 'c1', name: 'PRINCÍPIOS DE CONVERSÃO ELETROMECÂNICA', prof: 'PROFESSOR SILVA', ch: 64, credits: 4, schedule: ['SEG_14', 'QUA_14'], color: '#c4f4f7', border: '#6adcd3', icon: '⚡' },
-      { id: 'c2', name: 'ANÁLISE DE SISTEMAS TÉRMICOS', prof: 'MÔNICA', ch: 64, credits: 4, schedule: ['TER_08', 'QUI_08'], color: '#f7d5df', border: '#ea9bad', icon: '🔥' },
-      { id: 'c3', name: 'TRANSMISSÃO DE CALOR', prof: 'WILLIAM', ch: 64, credits: 4, schedule: ['QUA_08', 'SEG_10'], color: '#dcedf6', border: '#9fc0dd', icon: '🌡️' },
-      { id: 'c4', name: 'MÁQUINAS DE FLUXO', prof: 'CARLA', ch: 64, credits: 4, schedule: ['TER_10', 'QUI_10'], color: '#d2f2ea', border: '#7ed4c5', icon: '🔄' },
-      { id: 'c5', name: 'RESISTÊNCIA DOS MATERIAIS', prof: 'ILSON (LAB)', ch: 64, credits: 4, schedule: ['TER_14', 'QUI_14'], color: '#e8e2f3', border: '#b9aadd', icon: '🏗️' },
-      { id: 'c6', name: 'FILMES FINOS DE SEMICONDUTORES', prof: 'ANA FABÍOLA', ch: 64, credits: 4, schedule: ['SEG_08', 'SEX_08'], color: '#e3e7eb', border: '#b2bed0', icon: '🔬' },
-      { id: 'c7', name: 'EXPERIMENTOS DE FÍSICA', prof: 'MARCOS', ch: 32, credits: 2, schedule: ['SEX_10'], color: '#f3f6e5', border: '#c7d687', icon: '📐' }
+    const DEFAULT_SIMULATOR_CLASSES = [
+      { id: 'c1', name: 'PRINCÍPIOS DE CONVERSÃO ELETROMECÂNICA', prof: 'PROFESSOR SILVA', ch: 64, credits: 4, schedule: ['SEG_14', 'QUA_14'], color: '#c4f4f7', border: '#6adcd3', icon: '⚡', custom: false },
+      { id: 'c2', name: 'ANÁLISE DE SISTEMAS TÉRMICOS', prof: 'MÔNICA', ch: 64, credits: 4, schedule: ['TER_08', 'QUI_08'], color: '#f7d5df', border: '#ea9bad', icon: '🔥', custom: false },
+      { id: 'c3', name: 'TRANSMISSÃO DE CALOR', prof: 'WILLIAM', ch: 64, credits: 4, schedule: ['QUA_08', 'SEG_10'], color: '#dcedf6', border: '#9fc0dd', icon: '🌡️', custom: false },
+      { id: 'c4', name: 'MÁQUINAS DE FLUXO', prof: 'CARLA', ch: 64, credits: 4, schedule: ['TER_10', 'QUI_10'], color: '#d2f2ea', border: '#7ed4c5', icon: '🔄', custom: false },
+      { id: 'c5', name: 'RESISTÊNCIA DOS MATERIAIS', prof: 'ILSON (LAB)', ch: 64, credits: 4, schedule: ['TER_14', 'QUI_14'], color: '#e8e2f3', border: '#b9aadd', icon: '🏗️', custom: false },
+      { id: 'c6', name: 'FILMES FINOS DE SEMICONDUTORES', prof: 'ANA FABÍOLA', ch: 64, credits: 4, schedule: ['SEG_08', 'SEX_08'], color: '#e3e7eb', border: '#b2bed0', icon: '🔬', custom: false },
+      { id: 'c7', name: 'EXPERIMENTOS DE FÍSICA', prof: 'MARCOS', ch: 32, credits: 2, schedule: ['SEX_10'], color: '#f3f6e5', border: '#c7d687', icon: '📐', custom: false }
     ];
-    let simEnrolled = [];
+    let SIMULATOR_CLASSES = loadData('simulator_custom_classes', DEFAULT_SIMULATOR_CLASSES);
+    let simEnrolled = loadData('simulator_state', []);
     let simDraggedId = null;
+    let simDraftSchedule = [];
 
     function renderSimulator() {
       const panel = document.getElementById('panel-simulator'); if (!panel) return;
@@ -4105,11 +4156,15 @@
       html += `</div>
         
         <div class="sim-drawer fade-up delay-2" ondragover="simDragOverDrawer(event)" ondrop="simDropDrawer(event)">
-          <div class="sim-drawer-title">Disciplinas Disponíveis</div>
+          <div class="sim-drawer-title" style="display:flex;justify-content:space-between;align-items:center">
+             Disciplinas Disponíveis
+             <button onclick="openSimAddModal()" style="background:var(--teal);color:#fff;border:none;padding:6px 16px;border-radius:12px;font-size:11px;font-weight:700;cursor:pointer;box-shadow:var(--shadow)">+ Criar Personalizada</button>
+          </div>
           <div class="sim-drawer-list">
             ${availableClasses.map(c => `
               <div class="sim-card" id="sim-c-${c.id}" draggable="true" ondragstart="simDragStart(event, '${c.id}')" ondragend="simDragEnd(event)"
-                style="background:${c.color};color:#222;border-color:${c.border}">
+                style="background:${c.color};color:#222;border-color:${c.border};position:relative">
+                ${c.custom ? `<div onclick="deleteSimClass('${c.id}')" title="Excluir disciplina customizada" style="position:absolute;top:-6px;right:-6px;background:var(--coral);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;line-height:18px;cursor:pointer;opacity:0.9;z-index:15">✕</div>` : ''}
                 <div class="sim-card-icon">${c.icon}</div>
                 <div style="line-height:1.3">${esc(c.name)}</div>
                 <div style="font-size:8.5px;margin-top:4px;opacity:0.6">(${esc(c.prof)})</div>
@@ -4216,6 +4271,81 @@
           alert('Erro ao publicar. Você precisa estar logado com conta oficial (sem modo Demo).');
         });
       }
+    }
+
+    function openSimAddModal() {
+      simDraftSchedule = [];
+      document.getElementById('sim-new-name').value = '';
+      document.getElementById('sim-new-prof').value = '';
+      document.getElementById('sim-new-credits').value = '4';
+      document.getElementById('sim-new-color').value = '#c4f4f7';
+      renderSimSchGrid();
+      document.getElementById("modal-sim-add").classList.add("open");
+    }
+
+    function closeSimAddModal() {
+      document.getElementById("modal-sim-add").classList.remove("open");
+    }
+
+    function renderSimSchGrid() {
+      const g = document.getElementById('sim-sch-grid');
+      const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX'];
+      const timeIds = ['08', '10', '14', '16'];
+      let html = '';
+      days.forEach(d => { html += `<div style="font-size:10px;font-weight:800;color:var(--muted);padding-bottom:4px">${d}</div>`; });
+      timeIds.forEach(t => {
+        days.forEach(d => {
+           const id = `${d}_${t}`;
+           const sel = simDraftSchedule.includes(id);
+           html += `<div onclick="toggleSimDraftSlot('${id}')" title="${d} ${t}h" style="background:${sel?'var(--teal)':'var(--paper)'};color:${sel?'#fff':'var(--muted)'};border-radius:6px;padding:6px;font-size:11px;cursor:pointer;border:2px solid ${sel?'var(--teal)':'transparent'};font-weight:700;transition:all .1s">${t}h</div>`;
+        });
+      });
+      g.innerHTML = html;
+    }
+
+    function toggleSimDraftSlot(id) {
+      if(simDraftSchedule.includes(id)) { simDraftSchedule = simDraftSchedule.filter(x=>x!==id); }
+      else { simDraftSchedule.push(id); }
+      renderSimSchGrid();
+    }
+
+    function darkenHex(col) {
+      if(!col || col.length < 7) return '#000000';
+      let r = parseInt(col.substr(1,2),16), g = parseInt(col.substr(3,2),16), b = parseInt(col.substr(5,2),16);
+      return '#' + [r,g,b].map(x => Math.max(0, x - 30).toString(16).padStart(2,'0')).join('');
+    }
+
+    function saveSimCustomClass() {
+      const name = document.getElementById('sim-new-name').value.trim();
+      const prof = document.getElementById('sim-new-prof').value.trim();
+      const cred = parseInt(document.getElementById('sim-new-credits').value);
+      const icon = document.getElementById('sim-new-icon').value;
+      const col = document.getElementById('sim-new-color').value;
+
+      if(!name || !prof) { alert('Preencha nome e professor!'); return; }
+      if(simDraftSchedule.length === 0) { alert('Selecione pelo menos um horário na grade geométrica!'); return; }
+
+      const newClass = {
+        id: 'c_custom_' + Date.now(),
+        name: name, prof: prof,
+        ch: cred * 16, credits: cred,
+        schedule: [...simDraftSchedule],
+        color: col, border: darkenHex(col), icon: icon, custom: true
+      };
+
+      SIMULATOR_CLASSES.push(newClass);
+      saveData('simulator_custom_classes', SIMULATOR_CLASSES);
+      closeSimAddModal();
+      renderSimulator();
+    }
+
+    function deleteSimClass(id) {
+      if(!confirm('Deletar esta disciplina customizada? Ela será removida do Simulador.')) return;
+      SIMULATOR_CLASSES = SIMULATOR_CLASSES.filter(c => c.id !== id);
+      simEnrolled = simEnrolled.filter(cid => cid !== id);
+      saveData('simulator_custom_classes', SIMULATOR_CLASSES);
+      saveData('simulator_state', simEnrolled);
+      renderSimulator();
     }
 
 
