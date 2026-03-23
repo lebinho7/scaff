@@ -2889,8 +2889,8 @@
     try {
       const appCheck = firebase.appCheck();
       appCheck.activate(
-        // ATENÇÃO: Configurado agora para versão 100% GRATUITA (Sem cartão de crédito necessário)
-        new firebase.appCheck.ReCaptchaV3Provider('COLOQUE_AQUI_SUA_CHAVE_SITE_RECAPTCHA_V3'),
+        // Chave de Site V3 vinculada ao domínio autorizado:
+        new firebase.appCheck.ReCaptchaV3Provider('6LdKI5UsAAAAAMKzVBJ-FYsUdenQ-_ONRo94_BzS'),
         true // isTokenAutoRefreshEnabled
       );
     } catch(e) { console.warn('AppCheck UI boot warning:', e) }
