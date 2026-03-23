@@ -1,4 +1,4 @@
-const CACHE_NAME = 'scaff-v8';
+const CACHE_NAME = 'scaff-v9';
 const CORE_ASSETS = [
   './',
   './index.html',
