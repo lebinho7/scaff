@@ -2629,6 +2629,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
@@ -2883,6 +2884,17 @@
     /* ═══ FIREBASE ═══ */
     const firebaseConfig = { apiKey: "AIzaSyBjzVzGpqBZHPRyp1n4EuDs5dgJFJFRVz0", authDomain: "scaff-90d82.firebaseapp.com", projectId: "scaff-90d82", storageBucket: "scaff-90d82.firebasestorage.app", messagingSenderId: "491318718256", appId: "1:491318718256:web:fdc46fa2e0e28a075e22f5" };
     firebase.initializeApp(firebaseConfig);
+    
+    // AppCheck: bloqueia requisições fora do seu site / impede scrapers e bots de estourar a quota.
+    try {
+      const appCheck = firebase.appCheck();
+      appCheck.activate(
+        // ATENÇÃO: Substitua no futuro pela sua chave real de reCAPTCHA Enterprise!
+        new firebase.appCheck.ReCaptchaEnterpriseProvider('COLOQUE_CHAVE_SITE_KEY_DO_RECAPTCHA_AQUI'),
+        true // isTokenAutoRefreshEnabled
+      );
+    } catch(e) { console.warn('AppCheck UI boot warning:', e) }
+
     const auth = firebase.auth();
     const db = firebase.firestore();
 
@@ -3921,9 +3933,13 @@
           channel: communityChannel === 'todos' ? 'geral' : communityChannel,
           text: text,
           timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          likes: 0
+          likes: 0,
+          uid: STATE.currentUser.uid
         });
-      } catch (e) { console.error('Post error:', e) }
+      } catch (e) {
+        console.error('Post error:', e);
+        if (e.code === 'permission-denied') alert('Operação Negada: O Firebase bloqueou por razões de segurança (Regras não autorizadas ou App Check ausente).');
+      }
     }
 
     function listenCommunity() {

@@ -1,0 +1,39 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // 1) REGRAS DA COMUNIDADE (FÓRUM GLOBAL)
+    match /global_forum/{postId} {
+      // Qualquer usuário logado pode visualizar as postagens
+      allow read: if request.auth != null;
+      
+      // Criação de post: O usuário deve estar autenticado E o `uid` inserido no JSON deve ser o próprio UID real gerado pela autenticação dele no Firebase. Impede forjar postagens em nome de outros.
+      allow create: if request.auth != null 
+                    && request.resource.data.uid == request.auth.uid;
+      
+      // Edição de post: 
+      // Permite que qualquer um dê ou tire "likes" livremente.
+      // Permite que o autor legítimo edite outros campos do seu próprio texto, mas impede terceiros de fazê-lo.
+      allow update: if request.auth != null
+                    && (
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
+                      || resource.data.uid == request.auth.uid
+                    );
+                    
+      // Deleção permitida apenas para o dono
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+    
+    // 2) REGRAS DO PROGRESSO PESSOAL (Sincronização em Nuvem)
+    match /users_data/{userId} {
+      // Regra inviolável de isolamento: Ninguém lê e ninguém escreve aqui, a não ser que o ID do documento seja EXATAMENTE igual ao UID autenticado. Ninguém consegue bisbilhotar nem deletar sua disciplina ou progressos de estudos salvos.
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // 3) FALLBACK (Por Defeito, TRAVAR MUNDIALMENTE tudo na database)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
