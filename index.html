@@ -3942,40 +3942,159 @@
             }
             globalPosts.push({ id: doc.id, ...d, time: timeLabel });
           });
-          if (STATE.activeGlobal === 'community') renderCommunity();
+          if (STATE.activeGlobal === 'community' && (typeof communityTab === 'undefined' || communityTab === 'forum')) renderCommunity();
         });
     }
 
+    let communityTab = 'forum';
+    let profReviews = loadData('prof_reviews', []);
+
     function renderCommunity() {
       const panel = document.getElementById('panel-community'); if (!panel) return;
-      const channels = ['todos', 'geral', 'calc', 'fisica', 'quimica'];
-      const channelLabels = { todos: 'Todos', geral: '📢 Geral', calc: '📊 Cálculo', fisica: '⚡ Física', quimica: '🧪 Química' };
-      const filtered = communityChannel === 'todos' ? globalPosts : globalPosts.filter(p => p.channel === communityChannel);
-      const likes = getPostLikes();
-      let html = `<div class="comm-header fade-up"><div class="comm-title">💬 Comunidade</div></div>`;
-      html += `<div class="channel-chips fade-up">${channels.map(c =>
-        `<div class="channel-chip ${communityChannel === c ? 'active' : ''}" onclick="communityChannel='${c}';renderCommunity()">${channelLabels[c]}</div>`).join('')}</div>`;
-      html += `<div class="post-compose fade-up" style="margin-top:16px">
-    <div class="post-avatar" style="background:var(--coral);font-size:11px">${(document.getElementById('topbar-username')?.textContent || 'A').charAt(0).toUpperCase()}</div>
-    <textarea id="comm-input" placeholder="Compartilhe uma dúvida ou material..."></textarea>
-    <button class="post-compose-btn" onclick="addCommunityPost()">Postar</button></div>`;
-      filtered.forEach(p => {
-        const initials = p.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-        const color = AVATAR_COLORS[p.name.length % AVATAR_COLORS.length];
-        const isLiked = likes[p.id];
-        const likeCount = p.likes + (isLiked ? 1 : 0);
-        html += `<div class="post-card fade-up">
-      <div class="post-header">
-        <div class="post-avatar" style="background:${color}">${initials}</div>
-        <div class="post-name">${esc(p.name)}</div>
-        <span class="post-channel">${esc(channelLabels[p.channel] || p.channel)}</span>
-        <span class="post-time">${esc(p.time)}</span></div>
-      <div class="post-body">${esc(p.text)}</div>
-      <div class="post-actions">
-        <span class="post-action ${isLiked ? 'liked' : ''}" onclick="toggleLike(${typeof p.id === 'string' ? `'${p.id}'` : p.id})">${isLiked ? '❤️' : '🤍'} ${p.likes}</span>
-        <span class="post-action">💬 Responder</span></div></div>`;
-      });
+      const currUser = document.getElementById('topbar-username')?.textContent || 'Aluno';
+      
+      let html = `<div class="comm-header fade-up" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+        <div class="comm-title">💬 Comunidade</div>
+        <div style="display:flex;background:var(--card-bg);padding:4px;border-radius:20px;border:1px solid var(--rule);">
+          <button onclick="communityTab='forum';renderCommunity()" style="padding:6px 14px;border-radius:16px;border:none;cursor:pointer;font-size:11px;font-weight:700;transition:all .2s;background:${communityTab==='forum'?'var(--teal)':'transparent'};color:${communityTab==='forum'?'#fff':'var(--muted)'};">Fórum Global</button>
+          <button onclick="communityTab='reviews';renderCommunity()" style="padding:6px 14px;border-radius:16px;border:none;cursor:pointer;font-size:11px;font-weight:700;transition:all .2s;background:${communityTab==='reviews'?'var(--teal)':'transparent'};color:${communityTab==='reviews'?'#fff':'var(--muted)'};">Avaliar Professores</button>
+        </div>
+      </div>`;
+
+      if (communityTab === 'forum') {
+        const channels = ['todos', 'geral', 'calc', 'fisica', 'quimica'];
+        const channelLabels = { todos: 'Todos', geral: '📢 Geral', calc: '📊 Cálculo', fisica: '⚡ Física', quimica: '🧪 Química' };
+        const filtered = communityChannel === 'todos' ? globalPosts : globalPosts.filter(p => p.channel === communityChannel);
+        const likes = getPostLikes();
+        html += `<div class="channel-chips fade-up">${channels.map(c =>
+          `<div class="channel-chip ${communityChannel === c ? 'active' : ''}" onclick="communityChannel='${c}';renderCommunity()">${channelLabels[c]}</div>`).join('')}</div>`;
+        html += `<div class="post-compose fade-up" style="margin-top:16px">
+      <div class="post-avatar" style="background:var(--coral);font-size:11px">${currUser.charAt(0).toUpperCase()}</div>
+      <textarea id="comm-input" placeholder="Compartilhe uma dúvida ou material..."></textarea>
+      <button class="post-compose-btn" onclick="addCommunityPost()">Postar</button></div>`;
+        filtered.forEach(p => {
+          const initials = p.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+          const color = AVATAR_COLORS[p.name.length % AVATAR_COLORS.length];
+          const isLiked = likes[p.id];
+          const likeCount = p.likes + (isLiked ? 1 : 0);
+          html += `<div class="post-card fade-up">
+        <div class="post-header">
+          <div class="post-avatar" style="background:${color}">${initials}</div>
+          <div class="post-name">${esc(p.name)}</div>
+          <span class="post-channel">${esc(channelLabels[p.channel] || p.channel)}</span>
+          <span class="post-time">${esc(p.time)}</span></div>
+        <div class="post-body">${esc(p.text)}</div>
+        <div class="post-actions">
+          <span class="post-action ${isLiked ? 'liked' : ''}" onclick="toggleLike(${typeof p.id === 'string' ? `'${p.id}'` : p.id})">${isLiked ? '❤️' : '🤍'} ${p.likes}</span>
+          <span class="post-action">💬 Responder</span></div></div>`;
+        });
+      } else {
+        html += `<div class="fade-up" style="display:flex;flex-direction:column;gap:12px;">
+          <div class="post-compose" style="flex-direction:column;gap:12px;align-items:stretch;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:800;color:var(--teal)">Nova Avaliação Privada</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <input type="text" id="rev-prof" placeholder="Nome do Professor(a)" class="modal-input" style="flex:2;margin:0;padding:10px;font-size:13px;min-width:180px">
+              <input type="text" id="rev-subj" placeholder="Disciplina (Cadeira)" class="modal-input" style="flex:1.5;margin:0;padding:10px;font-size:13px;min-width:140px">
+              <select id="rev-stars" class="modal-input" style="flex:1;margin:0;padding:10px;background:var(--card-bg);font-size:13px;min-width:160px">
+                <option value="5">⭐⭐⭐⭐⭐ Excelente</option>
+                <option value="4">⭐⭐⭐⭐ Bom</option>
+                <option value="3">⭐⭐⭐ Razoável</option>
+                <option value="2">⭐⭐ Ruim</option>
+                <option value="1">⭐ Tenso</option>
+              </select>
+            </div>
+            <textarea id="rev-comment" placeholder="Como é a didática? Cobra muito em prova? Distribuição de notas? Compartilhe..." style="margin:0;min-height:70px;padding:12px;font-size:13px" class="modal-input"></textarea>
+            <input type="hidden" id="rev-edit-id" value="">
+            <div style="display:flex;justify-content:flex-end;gap:10px;align-items:center">
+               <button onclick="cancelEditReview()" id="rev-btn-cancel" style="display:none;padding:10px 20px;border-radius:20px;border:2px solid var(--rule);background:transparent;color:var(--muted);cursor:pointer;font-weight:800;font-size:11px;text-transform:uppercase;">Cancelar</button>
+               <button class="post-compose-btn" id="rev-btn-save" onclick="saveProfReview()" style="padding:10px 24px">Publicar Avaliação</button>
+            </div>
+          </div>`;
+
+        if (profReviews.length === 0) {
+          html += `<div style="text-align:center;padding:40px;color:var(--muted);font-size:12px">Nenhuma avaliação salva. Comece a criar o seu catálogo!</div>`;
+        }
+
+        profReviews.slice().reverse().forEach(r => {
+          const isMine = r.author === currUser || true; // Local edits permitted currently
+          let starsHtml = '';
+          for (let i = 1; i <= 5; i++) starsHtml += i <= r.rating ? '⭐' : '☆';
+          html += `<div class="post-card fade-up">
+            <div class="post-header" style="justify-content:space-between">
+               <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:36px;height:36px;border-radius:50%;background:#e3e7eb;display:flex;align-items:center;justify-content:center;font-size:16px;">👨‍🏫</div>
+                  <div>
+                    <div class="post-name" style="font-size:14px;color:var(--ink)">${esc(r.profName)} <span style="font-weight:600;color:var(--muted);font-size:12px">— ${esc(r.subject)}</span></div>
+                    <div style="font-size:11px;color:#f39c12;margin-top:2px;letter-spacing:1px">${starsHtml} <span style="color:var(--muted);margin-left:6px;font-size:10px;letter-spacing:normal">(Por: ${esc(r.author)})</span></div>
+                  </div>
+               </div>
+               ${isMine ? `<div style="display:flex;gap:12px">
+                 <button onclick="editProfReview('${r.id}')" style="background:transparent;border:none;cursor:pointer;font-size:14px;opacity:0.6;transition:opacity .2s" title="Editar" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">✏️</button>
+                 <button onclick="deleteProfReview('${r.id}')" style="background:transparent;border:none;cursor:pointer;font-size:14px;opacity:0.6;transition:opacity .2s" title="Excluir" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">🗑️</button>
+               </div>` : ''}
+            </div>
+            <div class="post-body" style="margin-top:10px;font-size:13.5px">${esc(r.comment)}</div>
+          </div>`;
+        });
+        html += `</div>`;
+      }
       panel.innerHTML = html;
+    }
+
+    function saveProfReview() {
+      const editId = document.getElementById('rev-edit-id')?.value;
+      const prof = document.getElementById('rev-prof')?.value;
+      const subj = document.getElementById('rev-subj')?.value;
+      const stars = parseInt(document.getElementById('rev-stars')?.value || '5');
+      const comm = document.getElementById('rev-comment')?.value;
+  
+      if (!prof || !subj) { alert('Preencha o nome do professor e da disciplina!'); return; }
+      
+      const currUser = document.getElementById('topbar-username')?.textContent || 'Aluno';
+  
+      if (editId) {
+        const idx = profReviews.findIndex(r => r.id === editId);
+        if(idx > -1) {
+          profReviews[idx] = { ...profReviews[idx], profName: prof, subject: subj, rating: stars, comment: comm };
+        }
+      } else {
+        profReviews.push({ id: 'pr_'+Date.now(), profName: prof, subject: subj, rating: stars, comment: comm, author: currUser });
+      }
+      
+      saveData('prof_reviews', profReviews);
+      renderCommunity();
+    }
+  
+    function editProfReview(id) {
+      const r = profReviews.find(x => x.id === id);
+      if(!r) return;
+      document.getElementById('rev-prof').value = r.profName;
+      document.getElementById('rev-subj').value = r.subject;
+      document.getElementById('rev-stars').value = r.rating;
+      document.getElementById('rev-comment').value = r.comment;
+      document.getElementById('rev-edit-id').value = r.id;
+      document.getElementById('rev-btn-save').textContent = 'Salvar Edição';
+      const cbtn = document.getElementById('rev-btn-cancel');
+      if(cbtn) cbtn.style.display = 'block';
+      document.getElementById('panel-community').scrollTo({top: 0, behavior: 'smooth'});
+    }
+  
+    function cancelEditReview() {
+      document.getElementById('rev-edit-id').value = '';
+      document.getElementById('rev-prof').value = '';
+      document.getElementById('rev-subj').value = '';
+      document.getElementById('rev-stars').value = '5';
+      document.getElementById('rev-comment').value = '';
+      document.getElementById('rev-btn-save').textContent = 'Publicar Avaliação';
+      const cbtn = document.getElementById('rev-btn-cancel');
+      if(cbtn) cbtn.style.display = 'none';
+    }
+  
+    function deleteProfReview(id) {
+      if(!confirm('Deletar e remover definitivamente esta avaliação do seu catálogo?')) return;
+      profReviews = profReviews.filter(x => x.id !== id);
+      saveData('prof_reviews', profReviews);
+      renderCommunity();
     }
 
     /* ═══ ABOUT PAGE ═══ */
