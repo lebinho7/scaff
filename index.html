@@ -2119,7 +2119,7 @@
     }
 
     /* ADD MODAL */
-    #modal-adddis {
+    #modal-adddis, #modal-sim-add {
       display: none;
       position: fixed;
       inset: 0;
@@ -2131,7 +2131,7 @@
       padding: 24px
     }
 
-    #modal-adddis.open {
+    #modal-adddis.open, #modal-sim-add.open {
       display: flex
     }
 
@@ -2842,7 +2842,8 @@
          <!-- renderizado via js -->
       </div>
 
-      <div class="modal-actions">
+      <div class="login-error" id="sim-add-error" role="alert" style="margin-top:20px;margin-bottom:10px"></div>
+      <div class="modal-actions" style="margin-top:8px">
         <button class="modal-btn-cancel" onclick="closeSimAddModal()">Cancelar</button>
         <button class="modal-btn-add" onclick="saveSimCustomClass()">Criar Disciplina</button>
       </div>
@@ -4164,7 +4165,7 @@
             ${availableClasses.map(c => `
               <div class="sim-card" id="sim-c-${c.id}" draggable="true" ondragstart="simDragStart(event, '${c.id}')" ondragend="simDragEnd(event)"
                 style="background:${c.color};color:#222;border-color:${c.border};position:relative">
-                ${c.custom ? `<div onclick="deleteSimClass('${c.id}')" title="Excluir disciplina customizada" style="position:absolute;top:-6px;right:-6px;background:var(--coral);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;line-height:18px;cursor:pointer;opacity:0.9;z-index:15">✕</div>` : ''}
+                <div onclick="deleteSimClass('${c.id}', ${c.custom})" title="${c.custom ? 'Excluir definitivamente' : 'Ocultar da gaveta'}" style="position:absolute;top:-6px;right:-6px;background:var(--coral);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;line-height:18px;cursor:pointer;opacity:0.9;z-index:15">✕</div>
                 <div class="sim-card-icon">${c.icon}</div>
                 <div style="line-height:1.3">${esc(c.name)}</div>
                 <div style="font-size:8.5px;margin-top:4px;opacity:0.6">(${esc(c.prof)})</div>
@@ -4231,7 +4232,15 @@
       });
       
       if (hasConflict) {
-        alert("Choque de horário detectado! Remova a disciplina conflitante primeiro.");
+        const slotEl = document.getElementById('slot-' + slotId);
+        if(slotEl) {
+           slotEl.style.transition = 'none';
+           slotEl.style.transform = 'translate(-6px, 0)';
+           setTimeout(()=> slotEl.style.transform = 'translate(6px, 0)', 50);
+           setTimeout(()=> slotEl.style.transform = 'translate(-4px, 0)', 100);
+           setTimeout(()=> slotEl.style.transform = 'translate(2px, 0)', 150);
+           setTimeout(()=> { slotEl.style.transform = 'none'; slotEl.style.transition = 'all .2s ease'; }, 200);
+        }
         return;
       }
       
@@ -4285,6 +4294,8 @@
 
     function closeSimAddModal() {
       document.getElementById("modal-sim-add").classList.remove("open");
+      const err = document.getElementById('sim-add-error');
+      if (err) err.classList.remove('show');
     }
 
     function renderSimSchGrid() {
@@ -4321,9 +4332,11 @@
       const cred = parseInt(document.getElementById('sim-new-credits').value);
       const icon = document.getElementById('sim-new-icon').value;
       const col = document.getElementById('sim-new-color').value;
-
-      if(!name || !prof) { alert('Preencha nome e professor!'); return; }
-      if(simDraftSchedule.length === 0) { alert('Selecione pelo menos um horário na grade geométrica!'); return; }
+      const err = document.getElementById('sim-add-error');
+      
+      err.classList.remove('show');
+      if(!name || !prof) { err.textContent = 'Preencha o nome da disciplina e o professor.'; err.classList.add('show'); return; }
+      if(simDraftSchedule.length === 0) { err.textContent = 'Selecione pelo menos um bloco de horário na grade geométrica.'; err.classList.add('show'); return; }
 
       const newClass = {
         id: 'c_custom_' + Date.now(),
@@ -4339,8 +4352,9 @@
       renderSimulator();
     }
 
-    function deleteSimClass(id) {
-      if(!confirm('Deletar esta disciplina customizada? Ela será removida do Simulador.')) return;
+    function deleteSimClass(id, isCustom) {
+      const msg = isCustom ? 'Deletar esta disciplina definitivamente do seu catálogo?' : 'Ocultar esta disciplina padrão da sua gaveta?';
+      if(!confirm(msg)) return;
       SIMULATOR_CLASSES = SIMULATOR_CLASSES.filter(c => c.id !== id);
       simEnrolled = simEnrolled.filter(cid => cid !== id);
       saveData('simulator_custom_classes', SIMULATOR_CLASSES);
