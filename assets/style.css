@@ -1,0 +1,45 @@
+
+/* Container Pai (div.gs-logo) */
+.gs-logo {
+  display: flex;         /* Transforma em um container flexível */
+  justify-content: center; /* Centraliza HORIZONTALMENTE */
+  align-items: center;     /* Centraliza VERTICALMENTE */
+  padding: 15px;         /* Reduzimos um pouco o padding para um "respiro" mais confortável */
+  /* padding-top: 15px; padding-bottom: 15px; padding-left: 20px; padding-right: 20px; */
+  /* Use um padding menor se o logo horizontal for muito longo */
+}
+
+/* Container Filho Intermediário (a) - CASO EXISTA */
+.gs-logo a {
+  display: flex;         /* Transforma o link em um container flexível para centralizar a imagem dentro */
+  justify-content: center; /* Garante alinhamento horizontal se o link se esticar */
+  align-items: center;     /* Garante alinhamento vertical se o link se esticar */
+  text-decoration: none;   /* Remova qualquer decoração de link */
+}
+
+/* Imagem do Logo (img.logo-img) */
+.logo-img {
+  height: 35px;          /* Define a altura do logo na barra lateral (diminuído de 45px) */
+  width: auto;           /* Mantém a proporção original */
+  max-width: 100%;       /* Garante que o logo nunca estoure a largura do container */
+  object-fit: contain;  /* Mantém a proporção da imagem sem cortá-la */
+  display: block;        /* Ajuda a evitar espaços extras indesejados abaixo da imagem */
+}
+
+/* --- SEÇÃO: CARD CENTRAL (login) --- */
+.gs-logo-section {
+  display: flex;
+  flex-direction: column; /* Coloca logo em cima e texto embaixo */
+  align-items: center;    /* Centraliza tudo na horizontal */
+  justify-content: center; /* Centraliza tudo na vertical */
+  padding: 60px;          /* Padding generoso para o card */
+  background-color: #fff;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.logo-card {
+  height: 80px; /* Maior para dar destaque no centro */
+  width: auto;
+  margin-bottom: 20px; /* Espaço entre o logo e o texto abaixo */
+}

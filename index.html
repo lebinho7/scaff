@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 
 <head>
+  <link rel="stylesheet" href="style.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Scaff — Biblioteca de Disciplinas</title>
@@ -9,7 +10,7 @@
     content="Scaff — Plataforma de gerenciamento de disciplinas universitárias com visualização de PDFs, acompanhamento de progresso e biblioteca organizada por semanas.">
   <meta property="og:title" content="Scaff — Biblioteca de Disciplinas">
   <meta property="og:description"
-    content="Gerencie suas disciplinas universitárias com progresso de estudo, PDFs organizados por semana e design premium.">
+    content="Gerencie suas disciplinas universitárias com  progresso de estudo, PDFs organizados por semana e design premium.">
   <meta property="og:type" content="website">
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23E8553E'/%3E%3Ctext x='3' y='23' font-family='Arial,sans-serif' font-weight='900' font-size='17' fill='white'%3Esc%3C/text%3E%3Ctext x='19' y='23' font-family='Arial,sans-serif' font-weight='900' font-size='17' fill='%231A5F6E'%3Eff%3C/text%3E%3Ctext x='27' y='11' font-family='Arial,sans-serif' font-size='9' fill='%23E8C547'%3E%E2%9C%A6%3C/text%3E%3C/svg%3E">
@@ -44,6 +45,8 @@
       --serif: 'Cormorant Garamond', serif;
       --topbar-bg: #fdfaf5;
       --sidebar-bg: #fdfaf5;
+      --sidebar-width: 260px;
+      --sidebar-collapsed-width: 64px;
     }
 
     html.dark {
@@ -362,15 +365,18 @@
     }
 
     .global-sidebar {
-      width: 260px;
+      width: var(--sidebar-width);
       background: var(--sidebar-bg);
       border-right: 1px solid var(--rule);
       display: flex;
       flex-direction: column;
       z-index: 100;
       flex-shrink: 0;
-      transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                  padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       padding: 12px;
+      position: relative;
+      overflow: visible;
     }
 
     .gs-logo {
@@ -382,6 +388,22 @@
       align-items: baseline;
       font-family: var(--serif);
       color: var(--teal-dk);
+    }
+
+    .global-sidebar.collapsed .gs-logo {
+      font-size: 1rem;
+      padding: 24px 0;
+      justify-content: center;
+      letter-spacing: 0;
+    }
+
+    .global-sidebar.collapsed .gs-logo .tl-a,
+    .global-sidebar.collapsed .gs-logo .tl-ff {
+      display: none;
+    }
+
+    .global-sidebar.collapsed .gs-logo .tl-spark {
+      display: none;
     }
 
     .gs-logo .tl-sc { color: var(--coral) }
@@ -437,6 +459,120 @@
       width: 24px;
       display: flex;
       justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Sidebar label (text next to icon) */
+    .gs-label {
+      white-space: nowrap;
+      overflow: hidden;
+      opacity: 1;
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  margin 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Collapsed sidebar */
+    .global-sidebar.collapsed {
+      width: var(--sidebar-collapsed-width);
+      padding: 12px 6px;
+    }
+
+    .global-sidebar.collapsed .gs-logo {
+      justify-content: center;
+      padding: 15px 4px;
+      overflow: hidden;
+    }
+
+    .global-sidebar.collapsed .gs-label {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      pointer-events: none;
+      margin: 0;
+    }
+
+    .global-sidebar.collapsed .gs-item {
+      justify-content: center;
+      padding: 14px 0;
+      gap: 0;
+      position: relative;
+    }
+
+    .global-sidebar.collapsed .gs-item:hover {
+      transform: none;
+    }
+
+    /* Tooltip on collapsed items */
+    .global-sidebar.collapsed .gs-item::after {
+      content: attr(aria-label);
+      position: absolute;
+      left: calc(100% + 12px);
+      top: 50%;
+      transform: translateY(-50%) scale(0.92);
+      background: var(--teal-dk);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s, transform 0.15s;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    }
+
+    html.dark .global-sidebar.collapsed .gs-item::after {
+      background: var(--paper3);
+      color: var(--ink);
+    }
+
+    .global-sidebar.collapsed .gs-item:hover::after {
+      opacity: 1;
+      transform: translateY(-50%) scale(1);
+    }
+
+    /* Sidebar toggle button */
+    .sidebar-toggle {
+      position: absolute;
+      top: 50%;
+      right: -14px;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--card-bg);
+      border: 1px solid var(--rule);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--muted);
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      z-index: 101;
+      transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .sidebar-toggle:hover {
+      background: var(--coral-lt);
+      color: var(--coral);
+      border-color: var(--coral);
+      box-shadow: 0 2px 12px rgba(232, 85, 62, .2);
+    }
+
+    .sidebar-toggle .toggle-icon {
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .global-sidebar.collapsed .sidebar-toggle .toggle-icon {
+      transform: rotate(180deg);
     }
 
     .app-wrapper-right {
@@ -2354,6 +2490,19 @@
       .topbar-user {
         display: none
       }
+
+      .sidebar-toggle {
+        display: none
+      }
+
+      .global-sidebar {
+        width: 100% !important;
+      }
+
+      .global-sidebar .gs-label {
+        opacity: 1 !important;
+        width: auto !important;
+      }
     }
 
     .login-toggle {
@@ -2452,8 +2601,8 @@
   <div id="screen-login" class="screen active" role="main">
     <div class="login-card fade-up">
       <div class="login-logo">
-        <div class="wordmark"><span class="sc">sc</span><span class="a">a</span><span class="ff">ff<span
-              class="spark">✦</span></span></div>
+        <div class="gs-logo-login"><a href="#"><img src="assets/scaff wordmark.png" alt="Scaff Logo"
+              class="logo-card"></a></div>
         <div class="tagline">Sua estrutura para o sucesso acadêmico.</div>
         <div class="rule-deco"></div>
       </div>
@@ -2505,26 +2654,32 @@
   <!-- APP -->
   <div id="screen-app" class="screen">
     <nav class="global-sidebar">
-      <div class="gs-logo"><span class="tl-sc">sc</span><span class="tl-a">a</span><span class="tl-ff">ff</span><span
-          class="tl-spark">✦</span></div>
+      <div class="gs-logo">
+        <a href="#">
+          <img src="assets/scaff wordmark.png" alt="Scaff Logo" id="sidebar-logo">
+        </a>
+      </div>
       <div class="gs-nav">
         <button class="gs-item active" id="gs-nav-home" onclick="showDashboard()" aria-label="Início"><span
-            class="gs-icon">🏠</span> Início</button>
+            class="gs-icon">🏠</span><span class="gs-label">Início</span></button>
         <button class="gs-item" id="gs-nav-schedule" onclick="showSchedule()" aria-label="Cronograma"><span
-            class="gs-icon">📅</span> Cronograma</button>
+            class="gs-icon">📅</span><span class="gs-label">Cronograma</span></button>
         <button class="gs-item" id="gs-nav-curriculum" onclick="showCurriculum()" aria-label="Percurso Curricular"><span
-            class="gs-icon">🎓</span> Curriculo</button>
+            class="gs-icon">🎓</span><span class="gs-label">Curriculo</span></button>
         <button class="gs-item" id="gs-nav-faltas" onclick="showFaltas()" aria-label="Contador de Faltas"><span
-            class="gs-icon">⚠️</span> Faltas</button>
+            class="gs-icon">⚠️</span><span class="gs-label">Faltas</span></button>
         <button class="gs-item" id="gs-nav-community" onclick="showCommunity()" aria-label="Comunidade"><span
-            class="gs-icon">💬</span> Comunidade</button>
+            class="gs-icon">💬</span><span class="gs-label">Comunidade</span></button>
         <button class="gs-item" id="gs-nav-explore" onclick="showExplore()" aria-label="Explorar Mapa"><span
-            class="gs-icon">🗺️</span> Explorar</button>
+            class="gs-icon">🗺️</span><span class="gs-label">Explorar</span></button>
       </div>
       <div class="gs-nav" style="flex:0;margin-top:auto;padding-bottom:24px">
         <button class="gs-item" id="gs-nav-about" onclick="showAbout()" aria-label="Sobre o app"><span
-            class="gs-icon">ℹ️</span> Sobre</button>
+            class="gs-icon">ℹ️</span><span class="gs-label">Sobre</span></button>
       </div>
+      <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Recolher menu" title="Recolher menu">
+        <span class="toggle-icon">‹</span>
+      </button>
     </nav>
 
     <div class="app-wrapper-right">
@@ -2879,8 +3034,37 @@
       }, 400);
     }
 
+    /* ═══ SIDEBAR TOGGLE ═══ */
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.global-sidebar');
+      sidebar.classList.toggle('collapsed');
+      const collapsed = sidebar.classList.contains('collapsed');
+      localStorage.setItem('scaff_sidebar_collapsed', collapsed ? 'true' : 'false');
+      document.getElementById('sidebar-logo').src = collapsed ? 'assets/scaff abelha.png' : 'assets/scaff wordmark.png';
+      const btn = document.querySelector('.sidebar-toggle');
+      if (btn) {
+        btn.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu');
+        btn.setAttribute('title', collapsed ? 'Expandir menu' : 'Recolher menu');
+      }
+    }
+
+    function restoreSidebarState() {
+      if (localStorage.getItem('scaff_sidebar_collapsed') === 'true') {
+        const sidebar = document.querySelector('.global-sidebar');
+        if (sidebar) {
+          sidebar.classList.add('collapsed');
+          document.getElementById('sidebar-logo').src = 'assets/scaff abelha.png';
+          const btn = document.querySelector('.sidebar-toggle');
+          if (btn) {
+            btn.setAttribute('aria-label', 'Expandir menu');
+            btn.setAttribute('title', 'Expandir menu');
+          }
+        }
+      }
+    }
+
     /* ═══ INIT ═══ */
-    function initApp() { renderTabs(); renderAppBody(); showDashboard() }
+    function initApp() { renderTabs(); renderAppBody(); showDashboard(); restoreSidebarState(); }
     function setDiscView(did, view) {
       STATE.discView[did] = view;
       const panel = document.getElementById('panel-' + did); if (!panel) return;
@@ -3687,11 +3871,11 @@
     function renderAbout() {
       const p = document.getElementById('panel-about'); if (!p) return;
       p.innerHTML = `<div class="fade-up" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px;background:var(--paper);height:100%">
-    <div style="font-size:4rem;font-weight:800;font-family:'Cormorant Garamond',serif;color:var(--teal);letter-spacing:-0.03em;line-height:1">sc<span style="color:var(--gold)">a</span><span style="color:var(--coral)">ff</span><span style="font-size:1.5rem;color:var(--gold);vertical-align:super">✦</span></div>
+    <div class="gs-logo-login"><a href="#"><img src="assets/scaff wordmark notext bw.png" alt="Scaff Logo"class="logo-card"></a></div>
     <div style="font-size:16px;font-weight:500;color:var(--muted);max-width:400px;margin-top:12px">Sua estrutura para o sucesso acadêmico.</div>
-    <div style="font-size:12px;font-family:var(--font-mono);color:rgba(0,0,0,0.5);margin-top:24px;padding:6px 12px;border:1px solid rgba(0,0,0,0.08);border-radius:12px;background:rgba(0,0,0,0.03)">v2.0.0 &middot; Premium Edition</div>
+    <div style="font-size:12px;font-family:var(--font-mono);color:rgba(0,0,0,0.5);margin-top:24px;padding:6px 12px;border:1px solid rgba(0,0,0,0.08);border-radius:12px;background:rgba(0,0,0,0.03)">vAlpha.04b &middot; Devs Edition</div>
     <div style="margin-top:48px;width:100%;max-width:300px;height:1px;background:linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)"></div>
-    <div style="margin-top:40px;font-size:14px;color:var(--ink);line-height:1.6">Desenvolvido por JS<br><br><b>wawa, rere and lebinho7</b> &middot; Engenharia de Energias Renováveis  (UFC)</div>
+    <div style="margin-top:40px;font-size:14px;color:var(--ink);line-height:1.6">Desenvolvido por Wawa, Rere e Lebinho7 da EER da UFC<br><br><b>FREEWORLD4EVER</b> &middot; </div>
   </div>`;
     }
 
