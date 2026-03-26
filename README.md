@@ -22,6 +22,12 @@
 
 > "Eu não sei o que eu faria sem o Scaff" - diz um dos desenvolvedores do Scaff.
 
+Como uma colmeia, a gente sabe que o conhecimento se constrói coletivamente. Cada estudante traz um grão de saber — um livro compartilhado, uma prova antiga, uma explicação valiosa — e juntos formamos uma estrutura viva e organizada. O nome Scaff vem de scaffolding, o andaime que dá suporte enquanto você ergue seu próprio entendimento. Aqui, oferecemos as bases temporárias para que você alcance novos andares na sua jornada acadêmica. E quando estiver pronto para voar, a colmeia continua vibrando, pronta para receber quem vem depois.
+
+<p align="center">
+  <img src="assets/scaff abelha.png">
+</p>
+
 ## ⤷ Funcionalidades
 
 | Feature | Descrição |
