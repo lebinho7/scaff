@@ -1,10 +1,6 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Scaff-Biblioteca%20de%20Disciplinas-1a3a2a?style=for-the-badge&labelColor=0f0e0c" alt="Scaff Badge">
+  <img src="assets/scaff wordmark.png">
 </p>
-
-<h1 align="center">
-  <em>Scaff</em>
-</h1>
 
 <p align="center">
   <strong>Plataforma de gerenciamento de disciplinas universitárias</strong><br>
@@ -20,30 +16,37 @@
 
 ---
 
-## 📖 Sobre
+## ⤷ Sobre
 
-**Scaff** é uma aplicação web single-file para organizar e acompanhar disciplinas universitárias. Pensada para estudantes de engenharia, a plataforma oferece uma interface editorial premium com sistema de abas por disciplina, visualização de PDFs compilados em LaTeX, e rastreamento de progresso por semana — tudo persistido localmente no navegador.
+**Scaff** é uma aplicação web single-file para organizar e acompanhar disciplinas universitárias. Pensada para estudantes de engenharia, a plataforma oferece uma interface editorial premium com sistema de abas por disciplina, visualização de PDFs compilados em LaTeX, e rastreamento de progresso por semana — tudo persistido localmente no navegador. Foi pensado por universitário para universitários, deixando o SIGAA (Sistema Integrado de Gestão de Atividades Acadêmicas) para institucionalidades e entregando o Scaff para os estudantes. Nossa plafatorma é aquele amigo organizado que todo universitário de exatas merecia ter: **uma mistura de biblioteca, repositório de materiais e comunidade, tudo num só lugar**. A gente reúne os livros-texto, listas de exercícios e um acervo compartilhado de provas antigas, tudo organizado por disciplina. O app também cria um cronograma sob medida pro seu semestre, funcionando como um guia que mostra o que estudar e quando, sem complicação.
 
-> _"Uma biblioteca de disciplinas que você abre no notebook antes de estudar."_
+> "Eu não sei o que eu faria sem o Scaff" - diz um dos desenvolvedores do Scaff.
 
-## ✨ Funcionalidades
+## ⤷ Funcionalidades
 
 | Feature | Descrição |
 |---------|-----------|
-| 🔐 **Login** | Tela de autenticação com sessão persistente via `localStorage` |
-| 📊 **Dashboard** | Visão geral com cards de disciplinas e barras de progresso dinâmicas |
-| 📑 **Abas por disciplina** | Navegação em tabs — abra múltiplas disciplinas simultaneamente |
-| 📋 **Sidebar de semanas** | Lista organizada por módulo com checkboxes de conclusão |
-| ✅ **Progresso real** | Calculado dinamicamente a partir das semanas concluídas |
-| 🔍 **Filtro de semanas** | Busca em tempo real na sidebar por título ou capítulo |
-| 📄 **Visualizador de PDF** | Área de preview com navegação entre semanas (← / →) |
-| 🌙 **Tema escuro/claro** | Toggle na topbar com transições suaves e persistência |
-| ➕ **Adicionar disciplinas** | Modal para criar novas disciplinas com seletor de cor |
-| 💾 **Persistência local** | Tema, progresso e sessão salvos no `localStorage` |
-| ♿ **Acessibilidade** | ARIA labels, focus trap em modais, skip link, `focus-visible` |
-| 🛡️ **Sanitização XSS** | Todo conteúdo dinâmico é sanitizado via `esc()` antes de renderizar |
+| **Login** | Tela de autenticação com sessão persistente via `localStorage` |
+| **Dashboard** | Visão geral com cards de disciplinas e barras de progresso dinâmicas |
+| **Abas por disciplina** | Navegação em tabs — abra múltiplas disciplinas simultaneamente |
+| **Sidebar de semanas** | Lista organizada por módulo com checkboxes de conclusão |
+| **Progresso real** | Calculado dinamicamente a partir das semanas concluídas e tenha acesso ao progresso do curso |
+| **Filtro de semanas** | Busca em tempo real na sidebar por título ou capítulo |
+| **Visualizador de PDF** | Área de preview com navegação entre semanas (← / →) |
+| **Barra de navegação** | Use expandida ou colapsada e navegue pelas páginas da plataforma |
+| **Tema escuro/claro** | Toggle na topbar com transições suaves e persistência |
+| **Adicionar disciplinas** | Modal para criar novas disciplinas com seletor de cor |
+| **Cronograma** | Pra você ficar ligado no que deve fazer |
+| **Calculadora de faltas** | Todo estudante precisava calcular as faltas do semestre... até hoje! |
+| **Simulador de matrícula** | Finja que é recesso letivo e você está vendo se vai sobrar tempo livre |
+| **Comunidade** | Veja o que o chiquinho.xp007 tem de tão importante a dizer ou avalie _aquele_ professor |
+| **Explorar** | Se perdeu no campus ou esqueceu onde é sua aula? Entra no Scaff pra conferir |
+| **Estatísticas** | Leia _in loco_ ou exporte em PDF para levar com você onde a internet não chegou ainda |
+| **Persistência local** | Tema, progresso e sessão salvos no `localStorage` |
+| **Acessibilidade** | ARIA labels, focus trap em modais, skip link, `focus-visible` |
+| **Sanitização XSS** | Todo conteúdo dinâmico é sanitizado via `esc()` antes de renderizar |
 
-## 🎓 Disciplinas Demo
+## ⤷ Disciplinas Demo
 
 A aplicação vem pré-carregada com 3 disciplinas de demonstração:
 
@@ -53,12 +56,12 @@ A aplicação vem pré-carregada com 3 disciplinas de demonstração:
 | **MAT201** | Cálculo Diferencial e Integral III | 14 | Stewart 8ª ed. |
 | **QUI301** | Termodinâmica Química | 16 | Smith, Van Ness & Abbott |
 
-## 🚀 Como Usar
+## ⤷ Como Usar
 
 ### Opção 1 — Abrir direto no navegador
 
 ```
-Basta abrir o arquivo index.html em qualquer navegador moderno.
+Basta abrir o arquivo index.html em qualquer navegador moderno. Ou então acesse https://w4-c3r.github.io/scaff/
 ```
 
 ### Opção 2 — Servidor local
@@ -79,14 +82,14 @@ Você tem duas opções para testar o aplicativo:
 1. **Modo Visitante (Demo):** Clique no botão "Explorar como Visitante (Demo)" na tela inicial. Todo o progresso será salvo apenas no seu navegador.
 2. **Conta Real:** Clique em "Criar conta", preencha um e-mail e senha, e seu progresso será salvo e sincronizado gratuitamente na nuvem via Firebase Firestore.
 
-## 🏗️ Arquitetura
+## ⤷ Arquitetura
 
 ```
 scaff/
 └── index.html    ← Aplicação completa (HTML + CSS + JS)
 ```
 
-**Single-file by design.** Zero dependências de build, zero node_modules, zero frameworks. Apenas um HTML que você pode hospedar em qualquer lugar — GitHub Pages, Netlify, ou abrir localmente.
+**Single-file by design.** Zero dependências de build, zero node_modules, zero frameworks. Apenas um HTML que você pode hospedar em qualquer lugar — GitHub Pages, Netlify, ou abrir localmente. Agradeça ao Lebinho7 por isso.
 
 ### Stack
 
@@ -95,19 +98,17 @@ scaff/
 - **Vanilla JS** — DOM manipulation, `localStorage`, `IntersectionObserver`
 - **Fonts** — [Cormorant Garamond](https://fonts.google.com/specimen/Cormorant+Garamond) (serif), [DM Mono](https://fonts.google.com/specimen/DM+Mono) (mono), [DM Sans](https://fonts.google.com/specimen/DM+Sans) (sans)
 
-## 🎨 Design System
+## ⤷ Design System
 
-| Token | Light | Dark |
-|-------|-------|------|
-| `--paper` | `#f5f2ec` | `#141210` |
-| `--ink` | `#0f0e0c` | `#e0ddd6` |
-| `--accent` | `#1a3a2a` | `#6abf8a` |
-| `--accent2` | `#c8502a` | `#e8764a` |
-| `--gold` | `#b8882a` | `#d4a840` |
+| Cor | HEX |
+|-------|-------|
+| Papel | `#fffefd` |
+| Marfim | `#2596be` |
+| Jambo claro | `#e8553e` |
+| Verde azulado | `#1a5f6e` |
+| Preto sensação | `#0e0f13` |
 
-Textura de grão SVG (`fractalNoise`) como overlay para estética editorial.
-
-## 📝 Roadmap
+## ⤷ Roadmap
 
 - [ ] Integração com PDFs reais via `week.pdfUrl`
 - [ ] Pipeline LaTeX → PDF automático
@@ -117,12 +118,12 @@ Textura de grão SVG (`fractalNoise`) como overlay para estética editorial.
 - [ ] Backend real com autenticação (substituir credenciais hardcoded)
 - [ ] Drag & drop para reordenar semanas
 
-## 📄 Licença
+## ⤷ Licença
 
-Este projeto é de uso acadêmico e pessoal.
+Este projeto é de uso acadêmico e pessoal até então.
 
 ---
 
 <p align="center">
-  <sub>Feito com ☕ por <strong>Kalebe</strong> · UFC · Engenharia de Energias Renováveis</sub>
+  <sub>Feito com ☕ por <strong>Kalebe</strong>, <strong>Hamilton</strong> e <strong>Wallace</strong> · UFC · Engenharia de Energias Renováveis</sub>
 </p>
