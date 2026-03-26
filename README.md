@@ -67,6 +67,7 @@ A aplicação vem pré-carregada com 3 disciplinas de demonstração:
 ### Opção 1 — Abrir direto no navegador
 
 Basta abrir o arquivo `index.html` em qualquer navegador moderno.
+
 Ou então acesse `https://w4-c3r.github.io/scaff/` no seu navegador.
 
 ### Opção 2 — Servidor local
